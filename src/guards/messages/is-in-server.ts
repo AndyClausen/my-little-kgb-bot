@@ -1,13 +1,13 @@
-import { GuardFunction } from '@typeit/discord';
+import { ArgsOf, GuardFunction } from '@typeit/discord';
+import { CommandInteraction } from 'discord.js';
 
-export function IsInServer(serverId: string): GuardFunction<'message'> {
-  return async (
-    [message],
-    client,
-    next
-  ) => {
-    if (message.guild && message.guild.id === serverId) {
+export function IsInServer(
+  serverId: string
+): GuardFunction<ArgsOf<'message'> | CommandInteraction> {
+  return async (arg, client, next) => {
+    const messageOrInteraction = arg instanceof CommandInteraction ? arg : arg[0];
+    if (messageOrInteraction.guild?.id === serverId) {
       await next();
     }
-  }
+  };
 }

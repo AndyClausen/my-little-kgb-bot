@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0
+- convert everything to slash commands
+- fix issues with `gulag` and nitro boosters
+
 ## 0.1.0
 - add basic code structure
 - add `move` command for bulk moving voice chat members

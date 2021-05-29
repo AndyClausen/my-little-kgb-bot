@@ -1,13 +1,12 @@
-import { Guard, On } from '@typeit/discord';
+import { Discord, Guard, On } from "@typeit/discord";
 import { Message } from 'discord.js';
 
-import { NotBot } from '../guards/messages/not-bot';
 import IsConfigEnabled from '../guards/config/is-config-enabled';
 import ServerExists from "../guards/config/server-exists";
 
+@Discord()
 export default class RandomSus {
   @On('message')
-  @Guard(NotBot)
   @Guard(ServerExists, IsConfigEnabled('randomSus'))
   async randomSus([message]: Message[]): Promise<void> {
     const roll = Math.random();

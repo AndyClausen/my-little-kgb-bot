@@ -11,6 +11,10 @@ export default async function upsertReactionMessage(
   const { reactionRolesMessageId, reactionRoles, reactionRolesChannelId } = server;
   const roleChannel = (await client.channels.fetch(reactionRolesChannelId)) as TextChannel;
 
+  if (!roleChannel) {
+    return;
+  }
+
   const roleEmbed = new MessageEmbed({
     title: 'Role Assignment',
     description: 'React to this to receive a role!',

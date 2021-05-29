@@ -1,8 +1,9 @@
-import { ArgsOf, On } from '@typeit/discord';
+import { ArgsOf, Discord, On } from "@typeit/discord";
 
 import ServerModel, { Server } from '../db/models/server';
 import sendSystemMessage from '../helpers/send-system-message';
 
+@Discord()
 export default class RegisterServer {
   @On('guildCreate')
   async botJoinServer([guild]: ArgsOf<'guildCreate'>): Promise<void> {

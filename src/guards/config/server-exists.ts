@@ -1,23 +1,28 @@
-import { GuardFunction } from '@typeit/discord';
+import { ArgsOf, GuardFunction } from '@typeit/discord';
 
 import ServerModel from '../../db/models/server';
-import sendSystemMessage from '../../helpers/send-system-message';
 import GuardCache from '../../types/GuardCache';
-import isMessageReaction from '../../helpers/is-message-reaction';
+import { CommandInteraction, MessageReaction } from "discord.js";
 
 const ServerExists: GuardFunction<
-  'message' | 'voiceStateUpdate' | 'messageReactionAdd' | 'messageReactionRemove',
+  | ArgsOf<'message' | 'voiceStateUpdate' | 'messageReactionAdd' | 'messageReactionRemove'>
+  | CommandInteraction,
   GuardCache
-> = async ([message], client, next, nextObj) => {
-  const guild = isMessageReaction(message) ? message.message.guild : message.guild;
+> = async (arg, client, next, nextObj) => {
+  const messageOrInteraction = arg instanceof CommandInteraction ? arg : arg[0];
+  const guild = messageOrInteraction instanceof MessageReaction
+    ? messageOrInteraction.message.guild
+    : messageOrInteraction.guild;
   if (!guild) {
     return;
   }
   const server = await ServerModel.findById(guild.id);
   if (!server) {
-    await sendSystemMessage(guild, {
-      message: `I may not have been configured properly! Please re-add me to your server or contact Andy.`,
-    });
+    if (messageOrInteraction instanceof CommandInteraction) {
+      await messageOrInteraction.reply(
+        `I may not have been configured properly! Please re-add me to your server or contact Andy.`
+      );
+    }
     return;
   }
   nextObj.server = server;

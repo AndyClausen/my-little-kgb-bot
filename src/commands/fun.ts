@@ -1,49 +1,63 @@
-import { Client, Command, CommandMessage, Guard } from '@typeit/discord';
+import { Client, Discord, Guard, Option, OptionType, Slash } from '@typeit/discord';
 
 import IsConfigEnabled from '../guards/config/is-config-enabled';
-import { getMemberArg } from '../helpers/get-member-arg';
 import ServerExists from '../guards/config/server-exists';
 import { getOrCreateCitizen } from '../db/get-or-create-citizen';
 import GuardCache from '../types/GuardCache';
+import { CommandInteraction, GuildMember } from 'discord.js';
 
+@Discord()
 export default class Fun {
-  @Command('ding :user')
-  async ding(command: CommandMessage<{ user: string }>): Promise<void> {
-    const member = await getMemberArg(command);
+  @Slash('ding', {
+    description: 'Make a game out of shaming someone for talking with their mic muted',
+  })
+  async ding(
+    @Option('user', OptionType.USER)
+    userId: string,
+    interaction: CommandInteraction
+  ): Promise<void> {
+    const member = await interaction.guild.members.fetch(userId);
     if (!member) {
-      await command.reply(`Usage: ${command.prefix}ding <@user|userId>`);
+      await interaction.reply(`Could not find that member`);
       return;
     }
     const citizen = await getOrCreateCitizen(member.id);
     citizen.dings++;
     await citizen.save();
-    await command.reply(
+    await interaction.reply(
       `DING!\n${member} has now talked ${citizen.dings} times with his mic muted`
     );
   }
 
-  @Command('unding :user')
-  async unding(command: CommandMessage): Promise<void> {
-    const member = await getMemberArg(command);
+  @Slash('unding', { description: 'When you ding someone by mistake' })
+  async unding(
+    @Option('user', OptionType.USER)
+    userId: string,
+    interaction: CommandInteraction
+  ): Promise<void> {
+    const member = await interaction.guild.members.fetch(userId);
     if (!member) {
-      await command.reply(`Usage: ${command.prefix}unding <@user|userId>`);
+      await interaction.reply(`Could not find that member`);
       return;
     }
     const citizen = await getOrCreateCitizen(member.id);
     citizen.dings--;
     await citizen.save();
-    await command.reply(
+    await interaction.reply(
       `Someone did a whoopsie! Ding count for ${member} is now ${citizen.dings}.`
     );
   }
 
-  @Command('rr')
+  @Slash('rr', { description: `Do it, you won't, no balls` })
   @Guard(ServerExists, IsConfigEnabled('russianRoulette'))
   async russianRoulette(
-    command: CommandMessage,
+    interaction: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
+    if (!(interaction.member instanceof GuildMember)) {
+      return;
+    }
     const mutedSeconds = 30;
     const roll = Math.random();
     const promises: Array<Promise<unknown>> = [];
@@ -51,40 +65,43 @@ export default class Fun {
     const { memberRole, gulagRole } = server.config;
 
     if (!memberRole || !gulagRole) {
-      await command.reply(
+      await interaction.reply(
         'Both `memberRole` and `gulagRole` must be set up for this to work properly'
       );
       return;
     }
 
     const hit = roll > 5 / 6;
-    const hadMemberRole = command.member.roles.cache.has(memberRole);
-    const hadGulagRole = command.member.roles.cache.has(gulagRole);
+    const hadMemberRole = interaction.member.roles.cache.has(memberRole);
+    const hadGulagRole = interaction.member.roles.cache.has(gulagRole);
 
     let res: string;
     if (hit) {
       if (hadMemberRole) {
-        promises.push(command.member.roles.remove(memberRole));
+        promises.push(interaction.member.roles.remove(memberRole));
       }
-      promises.push(command.member.roles.add(gulagRole), command.member.voice.setMute(true));
-      res = `**BANG!** You're dead, ${command.author}.`;
+      promises.push(
+        interaction.member.roles.add(gulagRole),
+        interaction.member.voice.setMute(true)
+      );
+      res = `**BANG!** You're dead, ${interaction.member}.`;
     } else {
-      res = `**CLICK!** You lived, ${command.author}! For now...`;
+      res = `**CLICK!** You lived, ${interaction.member}! For now...`;
     }
-    promises.push(command.channel.send(res));
+    promises.push(interaction.reply(res));
 
     await Promise.all(promises);
 
     // remove role after 10 seconds
-    if (hit && command.member) {
+    if (hit && interaction.member) {
       await new Promise((resolve) => setTimeout(resolve, mutedSeconds * 1000));
       if (!hadGulagRole) {
-        await command.member.roles.remove(gulagRole);
+        await interaction.member.roles.remove(gulagRole);
       }
       if (hadMemberRole) {
-        await command.member.roles.add(memberRole);
+        await interaction.member.roles.add(memberRole);
       }
-      await command.member.voice.setMute(false);
+      await interaction.member.voice.setMute(false);
     }
   }
 }

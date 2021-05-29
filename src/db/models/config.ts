@@ -30,7 +30,7 @@ export class Config {
   reactionRoles!: boolean;
 
   static isValidKey(key: string): key is keyof Config {
-    return key in ConfigModel.schema.paths;
+    return key && key in ConfigModel.schema.paths;
   }
 
   static isStringProp(key: keyof Config): key is PropsOfType<Config, string> {

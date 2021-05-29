@@ -1,4 +1,4 @@
-import { ArgsOf, Client, Guard, On } from '@typeit/discord';
+import { ArgsOf, Client, Discord, Guard, On } from '@typeit/discord';
 
 import { NotBotReaction } from '../guards/reactions/not-bot-reaction';
 import ServerExists from '../guards/config/server-exists';
@@ -6,7 +6,9 @@ import IsConfigEnabled from '../guards/config/is-config-enabled';
 import IsReactionRoleMessage from '../guards/reactions/is-reaction-role-message';
 import GuardCache from '../types/GuardCache';
 
-export default class ReactionRoles {
+@Discord()
+@Guard(NotBotReaction, ServerExists)
+export default abstract class ReactionRoles {
   @On('messageReactionAdd')
   @Guard(NotBotReaction, ServerExists, IsConfigEnabled('reactionRoles'), IsReactionRoleMessage)
   async addRoleToUser(
@@ -20,7 +22,7 @@ export default class ReactionRoles {
     if (!role) {
       return;
     }
-    const member = await messageReaction.message.guild.member(user.id);
+    const member = await messageReaction.message.guild.members.fetch(user.id);
     await member.roles.add(role._id);
   }
 
@@ -37,7 +39,7 @@ export default class ReactionRoles {
     if (!role) {
       return;
     }
-    const member = await messageReaction.message.guild.member(user.id);
+    const member = await messageReaction.message.guild.members.fetch(user.id);
     await member.roles.remove(role._id);
   }
 }

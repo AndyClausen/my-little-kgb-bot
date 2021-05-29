@@ -1,9 +1,10 @@
-import { ArgsOf, Client, Guard, On } from '@typeit/discord';
+import { ArgsOf, Client, Discord, Guard, On } from "@typeit/discord";
 
 import ServerExists from '../guards/config/server-exists';
 import GuardCache from '../types/GuardCache';
 import { Volunteer } from '../db/models/volunteer';
 
+@Discord()
 export default class GulagOnJoin {
   @On('guildMemberAdd')
   @Guard(ServerExists)

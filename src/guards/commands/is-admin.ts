@@ -1,25 +1,27 @@
 import { GuardFunction } from '@typeit/discord';
 
 import GuardCache from '../../types/GuardCache';
+import { CommandInteraction, GuildMember } from 'discord.js';
 
-export const IsAdmin: GuardFunction<'commandMessage', GuardCache> = async (
-  [command],
+export const IsAdmin: GuardFunction<CommandInteraction, GuardCache> = async (
+  message,
   client,
   next,
   { server }
 ) => {
-  if (command.author.id === command.guild.ownerID) {
+  if (!message.guild || !(message.member instanceof GuildMember)) {
+    return;
+  }
+  if (message.member.id === message.guild.ownerID) {
     await next();
     return;
   }
+
   const adminRole = server.config.adminRole;
-  if (!adminRole) {
-    await command.reply('The admin role has not been set yet! Please check config.');
+  if (!adminRole || !message.member.roles.cache.has(adminRole)) {
+    await message.reply(`You're not my Discord supervisor!`);
     return;
   }
-  if (!command.member.roles.cache.has(adminRole)) {
-    await command.channel.send(`You're not my Discord supervisor!`);
-    return;
-  }
+
   await next();
 };

@@ -1,14 +1,16 @@
-import { ArgsOf, Client, Guard, On } from '@typeit/discord';
+import { ArgsOf, Client, Discord, Guard, On } from '@typeit/discord';
 
 import { JoinVoiceChannel } from '../guards/voicestate/join-voice-channel';
 import { LeaveVoiceChannel } from '../guards/voicestate/leave-voice-channel';
 import mapVoiceChatRoles from '../helpers/map-voice-chat-role';
 import GuardCache from '../types/GuardCache';
-import ServerExists from "../guards/config/server-exists";
+import ServerExists from '../guards/config/server-exists';
 
+@Discord()
+@Guard(ServerExists)
 export default class VoiceChatRoles {
   @On('voiceStateUpdate')
-  @Guard(ServerExists, JoinVoiceChannel(mapVoiceChatRoles))
+  @Guard(JoinVoiceChannel(mapVoiceChatRoles))
   async addVoiceChatRoleToUser(
     [, after]: ArgsOf<'voiceStateUpdate'>,
     client: Client,
@@ -18,7 +20,7 @@ export default class VoiceChatRoles {
   }
 
   @On('voiceStateUpdate')
-  @Guard(ServerExists, LeaveVoiceChannel(mapVoiceChatRoles))
+  @Guard(LeaveVoiceChannel(mapVoiceChatRoles))
   async removeVoiceChatRoleFromUser(
     [before]: ArgsOf<'voiceStateUpdate'>,
     client: Client,

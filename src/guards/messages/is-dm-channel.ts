@@ -1,7 +1,17 @@
-import { GuardFunction } from '@typeit/discord';
+import { ArgsOf, GuardFunction } from '@typeit/discord';
+import { CommandInteraction } from 'discord.js';
 
-export const IsDMChannel: GuardFunction<'message'> = async ([message], client, next) => {
-  if (!message.guild && !message.author.bot) {
+export const IsDMChannel: GuardFunction<ArgsOf<'message'> | CommandInteraction> = async (
+  arg,
+  client,
+  next
+) => {
+  const messageOrInteraction = arg instanceof CommandInteraction ? arg : arg[0];
+  const user =
+    messageOrInteraction instanceof CommandInteraction
+      ? messageOrInteraction.user
+      : messageOrInteraction.author;
+  if (!messageOrInteraction.guild && !user.bot) {
     await next();
   }
 };

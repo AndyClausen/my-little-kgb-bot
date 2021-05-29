@@ -1,4 +1,14 @@
-import { Client, Command, CommandMessage, Guard } from '@typeit/discord';
+import {
+  Choices,
+  ChoicesType,
+  Client,
+  Discord,
+  Group,
+  Guard,
+  Option,
+  OptionType,
+  Slash,
+} from '@typeit/discord';
 import { DocumentType } from '@typegoose/typegoose';
 
 import ConfigModel, { Config as ConfigClass } from '../db/models/config';
@@ -6,29 +16,18 @@ import { Server } from '../db/models/server';
 import IsValidKey from '../guards/config/is-valid-key';
 import ServerExists from '../guards/config/server-exists';
 import GuardCache from '../types/GuardCache';
+import { IsAdmin } from '../guards/commands/is-admin';
+import { CommandInteraction } from 'discord.js';
 
+@Discord()
+@Guard(ServerExists, IsAdmin)
+@Group('config')
 export default class Config {
   private readonly validBooleans: ReadonlyArray<string | number> = ['true', 'false', 1, 0];
 
-  @Command('config')
-  @Guard(ServerExists)
-  async config(command: CommandMessage<never>): Promise<void> {
-    if (command.commandContent?.length > 'config'.length) {
-      return;
-    }
-    return this.help(command);
-  }
-
-  @Command('config help')
-  @Guard(ServerExists)
-  async help(command: CommandMessage<never>): Promise<void> {
-    await command.reply(`Available commands: list, set, get, enable, disable`);
-  }
-
-  @Command('config list')
-  @Guard(ServerExists)
+  @Slash('list')
   async list(
-    command: CommandMessage<never>,
+    interaction: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
@@ -37,67 +36,85 @@ export default class Config {
       (k: keyof ConfigClass) => (str += `${k}: ${server.config[k]}\n`)
     );
     str += '```';
-    await command.reply(str);
+    await interaction.reply(str, { ephemeral: true });
   }
 
-  @Command('config enable :key')
+  @Slash('enable')
   @Guard(IsValidKey)
-  @Guard(ServerExists)
   async enable(
-    command: CommandMessage<{ key: keyof ConfigClass }>,
+    @Choices(
+      Object.keys(ConfigModel.schema.paths)
+        .filter(ConfigClass.isBooleanProp)
+        .reduce<ChoicesType>((obj, key) => {
+          obj[key] = key;
+          return obj;
+        }, {})
+    )
+    @Option('key', OptionType.STRING, { required: true })
+    key: keyof ConfigClass,
+    interaction: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
-    await this.toggle(command, client, server, true);
+    await this.toggle(key, interaction, client, server, true);
   }
 
-  @Command('config disable :key')
+  @Slash('disable')
   @Guard(IsValidKey)
-  @Guard(ServerExists)
   async disable(
-    command: CommandMessage<{ key: keyof ConfigClass }>,
+    @Choices(
+      Object.keys(ConfigModel.schema.paths).reduce<ChoicesType>((obj, key) => {
+        obj[key] = key;
+        return obj;
+      }, {})
+    )
+    @Option('key', OptionType.STRING, { required: true })
+    key: keyof ConfigClass,
+    interaction: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
-    await this.toggle(command, client, server, false);
+    await this.toggle(key, interaction, client, server, false);
   }
 
   async toggle(
-    command: CommandMessage<{ key: keyof ConfigClass }>,
+    key: keyof ConfigClass,
+    interaction: CommandInteraction,
     client: Client,
     server: DocumentType<Server>,
     toggle: boolean
   ): Promise<void> {
-    const { key } = command.args;
-    if (!key) {
-      await command.reply(
-        `Invalid amount of arguments! Usage: ${command.prefix}${command.commandName} <key>`
-      );
-      return;
-    }
     if (!ConfigClass.isBooleanProp(key)) {
-      await command.reply(`${key} is not a boolean!`);
+      await interaction.reply(`${key} is not a boolean!`, { ephemeral: true });
       return;
     }
 
     server.config[key] = toggle;
     await server.save();
-    await command.reply(`${key} has been set to ${server.config[key]}`);
+    await interaction.reply(`${key} has been ${toggle ? 'enabled' : 'disabled'}`, {
+      ephemeral: true,
+    });
   }
 
-  @Command('config set :key :value')
+  @Slash('set')
   @Guard(IsValidKey)
-  @Guard(ServerExists)
   async set(
-    command: CommandMessage<{ key: keyof ConfigClass; value: string }>,
+    @Choices(
+      Object.keys(ConfigModel.schema.paths).reduce<ChoicesType>((obj, key) => {
+        obj[key] = key;
+        return obj;
+      }, {})
+    )
+    @Option('key', OptionType.STRING, { required: true })
+    key: keyof ConfigClass,
+    @Option('value', { required: true })
+    value: string,
+    interaction: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
-    const { key, value } = command.args;
-    if (!key || !value) {
-      await command.reply(
-        `Invalid amount of arguments! Usage: ${command.prefix}config set <key> <value>`
-      );
+    if (!ConfigClass.isValidKey(key)) {
+      await interaction.reply(`Invalid key ${key}!`, { ephemeral: true });
       return;
     }
 
@@ -106,19 +123,19 @@ export default class Config {
     } else if (ConfigClass.isNumberProp(key)) {
       const numValue = Number(value);
       if (!numValue) {
-        await command.reply('Please enter a valid number');
+        await interaction.reply('Please enter a valid number', { ephemeral: true });
         return;
       }
       if (key === 'susChance') {
         if (numValue <= 0 || numValue > 1) {
-          await command.reply('Please enter a number between 0 and 1');
+          await interaction.reply('Please enter a number between 0 and 1', { ephemeral: true });
           return;
         }
       }
       server.config[key] = numValue;
     } else if (ConfigClass.isBooleanProp(key)) {
       if (!this.validBooleans.includes(value)) {
-        await command.reply(
+        await interaction.reply(
           `Invalid value '${value}' for key '${key}'! Valid values: ${this.validBooleans.join(
             ', '
           )}`
@@ -127,26 +144,32 @@ export default class Config {
       }
       server.config[key] = ['true', 1].includes(value);
     } else {
-      await command.reply('Unknown type! Please report this to Andy.');
+      await interaction.reply('Unknown type! Please report this to Andy.', { ephemeral: true });
       return;
     }
     await server.save();
-    await command.reply(`${key} has been set to ${server.config[key]}`);
+    await interaction.reply(`${key} has been set to ${server.config[key]}`, { ephemeral: true });
   }
 
-  @Command('config get :key')
+  @Slash('get')
   @Guard(IsValidKey)
-  @Guard(ServerExists)
   async get(
-    command: CommandMessage<{ key: keyof ConfigClass }>,
+    @Choices(
+      Object.keys(ConfigModel.schema.paths).reduce<ChoicesType>((obj, key) => {
+        obj[key] = key;
+        return obj;
+      }, {})
+    )
+    @Option('key', OptionType.STRING, { required: true })
+    key: keyof ConfigClass,
+    interaction: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
-    const { key } = command.args;
-    if (!key) {
-      await command.reply(`Invalid amount of arguments! Usage: ${command.prefix}config get <key>`);
+    if (!ConfigClass.isValidKey(key)) {
+      await interaction.reply(`Invalid key ${key}!`, { ephemeral: true });
       return;
     }
-    await command.reply(`${key}: ${server.config[key]}`);
+    await interaction.reply(`${key}: ${server.config[key]}`, { ephemeral: true });
   }
 }
