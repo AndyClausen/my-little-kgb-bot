@@ -2,6 +2,7 @@
 
 ## 1.0.1
 - add support for category channels in voice chat roles
+- make member role more optional
 
 ## 1.0.0
 - convert everything to slash commands

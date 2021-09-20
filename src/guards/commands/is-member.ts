@@ -18,11 +18,7 @@ const IsMember: GuardFunction<ArgsOf<'message'> | CommandInteraction, GuardCache
     return;
   }
   const { memberRole } = server.config;
-  if (!memberRole) {
-    await messageOrInteraction.reply('The member role has not been set yet! Please check config.');
-    return;
-  }
-  if (!messageOrInteraction.member.roles.cache.has(memberRole)) {
+  if (memberRole && !messageOrInteraction.member.roles.cache.has(memberRole)) {
     await messageOrInteraction.reply(`You're not my Discord supervisor!`);
     return;
   }
