@@ -119,6 +119,14 @@ export default abstract class Roles {
       await command.reply(`Could not find channel with id '${channelId}'`, { ephemeral: true });
       return;
     }
+    const channelType = command.guild.channels.cache.get(channelId).type;
+    if (!['voice', 'category'].includes(channelType)) {
+      await command.reply(
+        `Channel is of type '${channelType}' - it must be either voice or category`,
+        { ephemeral: true }
+      );
+      return;
+    }
     if (server.voiceChatRoles.find((r) => r.roleId === roleId && r.channelId === channelId)) {
       await command.reply('That voice chat role already exists!', { ephemeral: true });
       return;

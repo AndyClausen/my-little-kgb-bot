@@ -125,10 +125,10 @@
     semver "^7.3.2"
     tslib "^2.0.1"
 
-"@typeit/discord@^5.0.10":
-  version "5.0.10"
-  resolved "https://registry.yarnpkg.com/@typeit/discord/-/discord-5.0.10.tgz#15b32a1c37c949bebd26d1a05f70e8b2403cd752"
-  integrity sha512-sUSI1FqgEkOe9CrTQJUjsxAOfAQiEG/3KGZEnMIdWXGlNXOQI/CYARplirQNdwsDx/Ce/39n0I1Ybxf7nA7Y2g==
+"@typeit/discord@^5.0.13":
+  version "5.0.13"
+  resolved "https://registry.yarnpkg.com/@typeit/discord/-/discord-5.0.13.tgz#a4cf6c1c4e8d3adddb23eba16b8adc8f5659dafd"
+  integrity sha512-81V6hQJBPwljiMMInEFmrN1VVW5QHGj2SDBaSAHP23giWbjGRUhlTRA/MW/EjKyGD5WpxHFGgmdAZ/nOFj3Ejw==
   dependencies:
     discord-api-types "^0.18.1"
     discord.js "github:discordjs/discord.js"
@@ -660,18 +660,6 @@ discord-api-types@^0.18.1:
   version "0.18.1"
   resolved "https://registry.yarnpkg.com/discord-api-types/-/discord-api-types-0.18.1.tgz#5d08ed1263236be9c21a22065d0e6b51f790f492"
   integrity sha512-hNC38R9ZF4uaujaZQtQfm5CdQO58uhdkoHQAVvMfIL0LgOSZeW575W8H6upngQOuoxWd8tiRII3LLJm9zuQKYg==
-
-"discord.js@file:D:/Code Projects/discord.js":
-  version "13.0.0-dev"
-  dependencies:
-    "@discordjs/collection" "^0.1.6"
-    "@discordjs/form-data" "^3.0.1"
-    "@sapphire/async-queue" "^1.1.2"
-    abort-controller "^3.0.0"
-    node-fetch "^2.6.1"
-    prism-media "^1.2.9"
-    tweetnacl "^1.0.3"
-    ws "^7.4.5"
 
 "discord.js@github:discordjs/discord.js":
   version "13.0.0-dev"

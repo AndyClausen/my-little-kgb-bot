@@ -13,7 +13,16 @@ export default function mapVoiceChatRoles(
     (r) => r.channelId === voiceState.channelID
   );
   if (!cache.voiceChatRoles.length) {
-    return;
+    if (!voiceState.channel?.parent) {
+      return;
+    }
+    cache.voiceChatRoles = cache.server.voiceChatRoles.filter(
+      (r) => r.channelId === voiceState.channel.parent.id
+    );
+    if (!cache.voiceChatRoles.length) {
+      return;
+    }
+    return voiceState.channel.parent.id;
   }
   return voiceState.channelID;
 }

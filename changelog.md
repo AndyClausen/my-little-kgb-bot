@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.1
+- add support for category channels in voice chat roles
+
 ## 1.0.0
 - convert everything to slash commands
 - fix issues with `gulag` and nitro boosters
