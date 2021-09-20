@@ -1,6 +1,6 @@
 {
   "name": "my-little-kgb-bot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "start": "ts-node-dev src/index.ts"
   },
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@typegoose/typegoose": "^7.6.0",
-    "@typeit/discord": "^5.0.10",
+    "@typeit/discord": "^5.0.13",
     "discord.js": "github:discordjs/discord.js",
     "dotenv": "^10.0.0",
     "moment": "^2.29.1",
