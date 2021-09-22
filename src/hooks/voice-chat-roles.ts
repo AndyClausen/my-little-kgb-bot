@@ -1,4 +1,4 @@
-import { ArgsOf, Client, Discord, Guard, On } from '@typeit/discord';
+import { ArgsOf, Client, Discord, Guard, On } from 'discordx';
 
 import { JoinVoiceChannel } from '../guards/voicestate/join-voice-channel';
 import { LeaveVoiceChannel } from '../guards/voicestate/leave-voice-channel';

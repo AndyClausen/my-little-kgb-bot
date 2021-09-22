@@ -5,7 +5,7 @@ export default async function sendMessageToUser(
   userId: Snowflake,
   message: string
 ): Promise<Message> {
-  const user = await client.users.fetch(userId, false);
+  const user = await client.users.fetch(userId);
   const channelDM = await user.createDM();
   return channelDM.send(message);
 }

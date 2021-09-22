@@ -1,4 +1,4 @@
-import { ArgsOf, Discord, On } from "@typeit/discord";
+import { ArgsOf, Discord, On } from 'discordx';
 
 import ServerModel, { Server } from '../db/models/server';
 import sendSystemMessage from '../helpers/send-system-message';

@@ -1,4 +1,4 @@
-import { ArgsOf, GuardFunction } from '@typeit/discord';
+import { ArgsOf, GuardFunction } from 'discordx';
 
 import GuardCache from '../../types/GuardCache';
 

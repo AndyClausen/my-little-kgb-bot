@@ -1,4 +1,4 @@
-import { GuardFunction } from '@typeit/discord';
+import { GuardFunction } from 'discordx';
 
 import GuardCache from '../../types/GuardCache';
 import { CommandInteraction, GuildMember } from 'discord.js';
@@ -12,7 +12,7 @@ export const IsAdmin: GuardFunction<CommandInteraction, GuardCache> = async (
   if (!message.guild || !(message.member instanceof GuildMember)) {
     return;
   }
-  if (message.member.id === message.guild.ownerID) {
+  if (message.member.id === message.guild.ownerId) {
     await next();
     return;
   }

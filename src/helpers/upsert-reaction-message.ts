@@ -1,5 +1,5 @@
 import { EmbedFieldData, Message, MessageEmbed, TextChannel } from 'discord.js';
-import { Client } from '@typeit/discord';
+import { Client } from 'discordx';
 import { DocumentType } from '@typegoose/typegoose';
 
 import { Server } from '../db/models/server';
@@ -27,9 +27,9 @@ export default async function upsertReactionMessage(
   let roleMessage: Message;
   if (reactionRolesMessageId) {
     roleMessage = await roleChannel.messages.fetch(reactionRolesMessageId);
-    await roleMessage.edit({ embed: roleEmbed });
+    await roleMessage.edit({ embeds: [roleEmbed] });
   } else {
-    roleMessage = await roleChannel.send({ embed: roleEmbed });
+    roleMessage = await roleChannel.send({ embeds: [roleEmbed] });
     server.reactionRolesMessageId = roleMessage.id;
     await server.save();
   }

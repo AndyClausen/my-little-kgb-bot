@@ -1,4 +1,4 @@
-import { Client } from '@typeit/discord';
+import { Client } from 'discordx';
 import * as moment from 'moment';
 import sendMessageToUser from './send-message-to-user';
 import getMillisUntilTime from './get-millis-until-time';

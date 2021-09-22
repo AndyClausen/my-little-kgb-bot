@@ -1,4 +1,4 @@
-import { ArgsOf, GuardFunction } from '@typeit/discord';
+import { ArgsOf, GuardFunction } from 'discordx';
 import { CommandInteraction } from 'discord.js';
 
 export const IsDMChannel: GuardFunction<ArgsOf<'message'> | CommandInteraction> = async (

@@ -1,4 +1,4 @@
-import { ArgsOf, GuardFunction } from '@typeit/discord';
+import { ArgsOf, GuardFunction } from 'discordx';
 import { CommandInteraction } from 'discord.js';
 
 export function FromUser(userId: string): GuardFunction<ArgsOf<'message'> | CommandInteraction> {

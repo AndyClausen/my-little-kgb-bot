@@ -1,10 +1,10 @@
-import { Client, Discord, Guard, Option, OptionType, Slash } from '@typeit/discord';
+import { Client, Discord, Guard, SlashOption, Slash } from 'discordx';
 
 import IsConfigEnabled from '../guards/config/is-config-enabled';
 import ServerExists from '../guards/config/server-exists';
 import { getOrCreateCitizen } from '../db/get-or-create-citizen';
 import GuardCache from '../types/GuardCache';
-import { CommandInteraction, GuildMember } from 'discord.js';
+import { CommandInteraction, GuildMember, User } from 'discord.js';
 
 @Discord()
 export default class Fun {
@@ -12,11 +12,11 @@ export default class Fun {
     description: 'Make a game out of shaming someone for talking with their mic muted',
   })
   async ding(
-    @Option('user', OptionType.USER)
-    userId: string,
+    @SlashOption('user', { type: 'USER', required: true })
+    user: User | GuildMember,
     interaction: CommandInteraction
   ): Promise<void> {
-    const member = await interaction.guild.members.fetch(userId);
+    const member = await interaction.guild.members.fetch(user);
     if (!member) {
       await interaction.reply(`Could not find that member`);
       return;
@@ -31,11 +31,11 @@ export default class Fun {
 
   @Slash('unding', { description: 'When you ding someone by mistake' })
   async unding(
-    @Option('user', OptionType.USER)
-    userId: string,
+    @SlashOption('user', { type: 'USER', required: true })
+    user: User | GuildMember,
     interaction: CommandInteraction
   ): Promise<void> {
-    const member = await interaction.guild.members.fetch(userId);
+    const member = await interaction.guild.members.fetch(user);
     if (!member) {
       await interaction.reply(`Could not find that member`);
       return;

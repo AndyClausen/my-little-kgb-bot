@@ -10,7 +10,7 @@ export default function mapVoiceChatRoles(
     return;
   }
   cache.voiceChatRoles = cache.server.voiceChatRoles.filter(
-    (r) => r.channelId === voiceState.channelID
+    (r) => r.channelId === voiceState.channelId
   );
   if (!cache.voiceChatRoles.length) {
     if (!voiceState.channel?.parent) {
@@ -24,5 +24,5 @@ export default function mapVoiceChatRoles(
     }
     return voiceState.channel.parent.id;
   }
-  return voiceState.channelID;
+  return voiceState.channelId;
 }

@@ -1,4 +1,4 @@
-import { ArgsOf, Client, Discord, Guard, On } from "@typeit/discord";
+import { ArgsOf, Client, Discord, Guard, On } from 'discordx';
 
 import ServerExists from '../guards/config/server-exists';
 import GuardCache from '../types/GuardCache';

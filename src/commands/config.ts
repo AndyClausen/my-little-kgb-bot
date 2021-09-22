@@ -1,14 +1,4 @@
-import {
-  Choices,
-  ChoicesType,
-  Client,
-  Discord,
-  Group,
-  Guard,
-  Option,
-  OptionType,
-  Slash,
-} from '@typeit/discord';
+import { SlashChoice, Client, Discord, SlashGroup, Guard, SlashOption, Slash } from 'discordx';
 import { DocumentType } from '@typegoose/typegoose';
 
 import ConfigModel, { Config as ConfigClass } from '../db/models/config';
@@ -21,7 +11,7 @@ import { CommandInteraction } from 'discord.js';
 
 @Discord()
 @Guard(ServerExists, IsAdmin)
-@Group('config')
+@SlashGroup('config')
 export default class Config {
   private readonly validBooleans: ReadonlyArray<string | number> = ['true', 'false', 1, 0];
 
@@ -36,21 +26,21 @@ export default class Config {
       (k: keyof ConfigClass) => (str += `${k}: ${server.config[k]}\n`)
     );
     str += '```';
-    await interaction.reply(str, { ephemeral: true });
+    await interaction.reply({ content: str, ephemeral: true });
   }
 
   @Slash('enable')
   @Guard(IsValidKey)
   async enable(
-    @Choices(
+    @SlashChoice(
       Object.keys(ConfigModel.schema.paths)
         .filter(ConfigClass.isBooleanProp)
-        .reduce<ChoicesType>((obj, key) => {
+        .reduce<any>((obj, key) => {
           obj[key] = key;
           return obj;
         }, {})
     )
-    @Option('key', OptionType.STRING, { required: true })
+    @SlashOption('key', { type: 'STRING', required: true })
     key: keyof ConfigClass,
     interaction: CommandInteraction,
     client: Client,
@@ -62,13 +52,13 @@ export default class Config {
   @Slash('disable')
   @Guard(IsValidKey)
   async disable(
-    @Choices(
-      Object.keys(ConfigModel.schema.paths).reduce<ChoicesType>((obj, key) => {
+    @SlashChoice(
+      Object.keys(ConfigModel.schema.paths).reduce<any>((obj, key) => {
         obj[key] = key;
         return obj;
       }, {})
     )
-    @Option('key', OptionType.STRING, { required: true })
+    @SlashOption('key', { type: 'STRING', required: true })
     key: keyof ConfigClass,
     interaction: CommandInteraction,
     client: Client,
@@ -85,13 +75,14 @@ export default class Config {
     toggle: boolean
   ): Promise<void> {
     if (!ConfigClass.isBooleanProp(key)) {
-      await interaction.reply(`${key} is not a boolean!`, { ephemeral: true });
+      await interaction.reply({ content: `${key} is not a boolean!`, ephemeral: true });
       return;
     }
 
     server.config[key] = toggle;
     await server.save();
-    await interaction.reply(`${key} has been ${toggle ? 'enabled' : 'disabled'}`, {
+    await interaction.reply({
+      content: `${key} has been ${toggle ? 'enabled' : 'disabled'}`,
       ephemeral: true,
     });
   }
@@ -99,22 +90,22 @@ export default class Config {
   @Slash('set')
   @Guard(IsValidKey)
   async set(
-    @Choices(
-      Object.keys(ConfigModel.schema.paths).reduce<ChoicesType>((obj, key) => {
+    @SlashChoice(
+      Object.keys(ConfigModel.schema.paths).reduce<any>((obj, key) => {
         obj[key] = key;
         return obj;
       }, {})
     )
-    @Option('key', OptionType.STRING, { required: true })
+    @SlashOption('key', { type: 'STRING', required: true })
     key: keyof ConfigClass,
-    @Option('value', { required: true })
+    @SlashOption('value', { required: true })
     value: string,
     interaction: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
     if (!ConfigClass.isValidKey(key)) {
-      await interaction.reply(`Invalid key ${key}!`, { ephemeral: true });
+      await interaction.reply({ content: `Invalid key ${key}!`, ephemeral: true });
       return;
     }
 
@@ -123,12 +114,15 @@ export default class Config {
     } else if (ConfigClass.isNumberProp(key)) {
       const numValue = Number(value);
       if (!numValue) {
-        await interaction.reply('Please enter a valid number', { ephemeral: true });
+        await interaction.reply({ content: 'Please enter a valid number', ephemeral: true });
         return;
       }
       if (key === 'susChance') {
         if (numValue <= 0 || numValue > 1) {
-          await interaction.reply('Please enter a number between 0 and 1', { ephemeral: true });
+          await interaction.reply({
+            content: 'Please enter a number between 0 and 1',
+            ephemeral: true,
+          });
           return;
         }
       }
@@ -144,32 +138,38 @@ export default class Config {
       }
       server.config[key] = ['true', 1].includes(value);
     } else {
-      await interaction.reply('Unknown type! Please report this to Andy.', { ephemeral: true });
+      await interaction.reply({
+        content: 'Unknown type! Please report this to Andy.',
+        ephemeral: true,
+      });
       return;
     }
     await server.save();
-    await interaction.reply(`${key} has been set to ${server.config[key]}`, { ephemeral: true });
+    await interaction.reply({
+      content: `${key} has been set to ${server.config[key]}`,
+      ephemeral: true,
+    });
   }
 
   @Slash('get')
   @Guard(IsValidKey)
   async get(
-    @Choices(
-      Object.keys(ConfigModel.schema.paths).reduce<ChoicesType>((obj, key) => {
+    @SlashChoice(
+      Object.keys(ConfigModel.schema.paths).reduce<any>((obj, key) => {
         obj[key] = key;
         return obj;
       }, {})
     )
-    @Option('key', OptionType.STRING, { required: true })
+    @SlashOption('key', { type: 'STRING', required: true })
     key: keyof ConfigClass,
     interaction: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
     if (!ConfigClass.isValidKey(key)) {
-      await interaction.reply(`Invalid key ${key}!`, { ephemeral: true });
+      await interaction.reply({ content: `Invalid key ${key}!`, ephemeral: true });
       return;
     }
-    await interaction.reply(`${key}: ${server.config[key]}`, { ephemeral: true });
+    await interaction.reply({ content: `${key}: ${server.config[key]}`, ephemeral: true });
   }
 }
