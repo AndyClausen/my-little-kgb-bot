@@ -1,4 +1,4 @@
-import { ArgsOf, GuardFunction } from '@typeit/discord';
+import { ArgsOf, GuardFunction } from 'discordx';
 
 export function IsInChannel(channelId: string): GuardFunction<ArgsOf<'message'>> {
   return async ([message], client, next) => {

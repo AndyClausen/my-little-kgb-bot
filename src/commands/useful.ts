@@ -1,4 +1,4 @@
-import { Client, Discord, Guard, Slash } from '@typeit/discord';
+import { Client, Discord, Guard, Slash } from 'discordx';
 import { CommandInteraction, MessageEmbed } from 'discord.js';
 
 import IsMember from '../guards/commands/is-member';
@@ -15,7 +15,11 @@ export default class Useful {
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
-    if (!interaction.channel.isText() || interaction.channel.type === 'dm') {
+    if (
+      !interaction.channel.isText() ||
+      interaction.channel.isThread() ||
+      interaction.channel.type === 'DM'
+    ) {
       return;
     }
 
@@ -43,6 +47,6 @@ export default class Useful {
 
     const dmChannel = await interaction.user.createDM();
     await dmChannel.send(invite.url);
-    await interaction.reply('Sent you an invite in dm uwu', { ephemeral: true });
+    await interaction.reply({ content: 'Sent you an invite in dm uwu', ephemeral: true });
   }
 }

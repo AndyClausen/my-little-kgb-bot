@@ -1,8 +1,8 @@
-import { Discord, Guard, On } from "@typeit/discord";
+import { Discord, Guard, On } from 'discordx';
 import { Message } from 'discord.js';
 
 import IsConfigEnabled from '../guards/config/is-config-enabled';
-import ServerExists from "../guards/config/server-exists";
+import ServerExists from '../guards/config/server-exists';
 
 @Discord()
 export default class RandomSus {

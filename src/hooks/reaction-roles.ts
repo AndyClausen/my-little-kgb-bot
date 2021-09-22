@@ -1,4 +1,4 @@
-import { ArgsOf, Client, Discord, Guard, On } from '@typeit/discord';
+import { ArgsOf, Client, Discord, Guard, On } from 'discordx';
 
 import { NotBotReaction } from '../guards/reactions/not-bot-reaction';
 import ServerExists from '../guards/config/server-exists';

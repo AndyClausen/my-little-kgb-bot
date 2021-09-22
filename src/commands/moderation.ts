@@ -1,10 +1,11 @@
-import { Client, Discord, Guard, Option, OptionType, Slash } from '@typeit/discord';
+import { Client, Discord, Guard, SlashOption, Slash } from 'discordx';
 import {
   BaseGuildVoiceChannel,
   CommandInteraction,
   DiscordAPIError,
   GuildChannel,
   GuildMember,
+  User,
 } from 'discord.js';
 
 import { IsAdmin } from '../guards/commands/is-admin';
@@ -19,12 +20,14 @@ import GuardCache from '../types/GuardCache';
 export default abstract class Moderation {
   @Slash('move', { description: 'Move all users from one voice channel to another' })
   async bulkMove(
-    @Option('to', OptionType.CHANNEL, {
+    @SlashOption('to', {
+      type: 'CHANNEL',
       description: 'Channel to move to',
       required: true,
     })
     channelTo: GuildChannel,
-    @Option('from', OptionType.CHANNEL, {
+    @SlashOption('from', {
+      type: 'CHANNEL',
       description: 'Channel to move from',
       required: false,
     })
@@ -52,7 +55,8 @@ export default abstract class Moderation {
       !(channelFrom instanceof BaseGuildVoiceChannel) ||
       !(channelTo instanceof BaseGuildVoiceChannel)
     ) {
-      await interaction.reply(`The channels _must_ be voice or stage channels!`, {
+      await interaction.reply({
+        content: `The channels _must_ be voice or stage channels!`,
         ephemeral: true,
       });
       return;
@@ -74,47 +78,50 @@ export default abstract class Moderation {
       );
     } catch (e) {
       if (e.name === 'missingConnectPerm') {
-        await interaction.reply(
-          `Member <@${e.message}> does not have permission to connect to ${channelTo.name}`,
-          { ephemeral: true }
-        );
+        await interaction.reply({
+          content: `Member <@${e.message}> does not have permission to connect to ${channelTo.name}`,
+          ephemeral: true,
+        });
         return;
       }
-      await interaction.reply(`${e.name}: ${e.message}`, { ephemeral: true });
+      await interaction.reply({ content: `${e.name}: ${e.message}`, ephemeral: true });
       return;
     }
-    await interaction.reply(`Done! Moved ${channelSize} user${channelSize > 1 ? 's' : ''}.`, {
+    await interaction.reply({
+      content: `Done! Moved ${channelSize} user${channelSize > 1 ? 's' : ''}.`,
       ephemeral: true,
     });
   }
 
   @Slash('gulag')
   async gulag(
-    @Option('user', OptionType.USER, {
+    @SlashOption('user', {
+      type: 'USER',
       description: 'User to gulag',
       required: true,
     })
-    userId: string,
+    user: User | GuildMember,
     interaction: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
-    const member = await interaction.guild.members.fetch(userId);
+    const member = await interaction.guild.members.fetch(user);
     if (!member) {
-      await interaction.reply(`Please give a user ID as argument!`, { ephemeral: true });
+      await interaction.reply({ content: `Please give a user ID as argument!`, ephemeral: true });
       return;
     }
 
     const { gulagRole, adminRole } = server.config;
     if (!gulagRole) {
-      await interaction.reply('You have not set a gulag role in the config!', {
+      await interaction.reply({
+        content: 'You have not set a gulag role in the config!',
         ephemeral: true,
       });
       return;
     }
 
     if (server.gulag.find((volunteer) => volunteer._id === member.id)) {
-      await interaction.reply(`${member} is already in gulag`, { ephemeral: true });
+      await interaction.reply({ content: `${member} is already in gulag`, ephemeral: true });
       return;
     }
     const roles = member.roles.cache
@@ -126,10 +133,10 @@ export default abstract class Moderation {
         await member.roles.remove(roles, 'gulag');
       } catch (e) {
         if (e instanceof DiscordAPIError && e.message === 'Missing Permissions') {
-          await interaction.reply(
-            `I don't have permissions to remove one or more of this person's roles!`,
-            { ephemeral: true }
-          );
+          await interaction.reply({
+            content: `I don't have permissions to remove one or more of this person's roles!`,
+            ephemeral: true,
+          });
           return;
         }
         throw e;
@@ -139,7 +146,8 @@ export default abstract class Moderation {
       await member.roles.add(gulagRole, 'gulag');
     } catch (e) {
       if (e instanceof DiscordAPIError && e.message === 'Missing Permissions') {
-        await interaction.reply(`I don't have permissions to add the gulag role to this person!`, {
+        await interaction.reply({
+          content: `I don't have permissions to add the gulag role to this person!`,
           ephemeral: true,
         });
         return;
@@ -166,31 +174,34 @@ export default abstract class Moderation {
     const citizen = await getOrCreateCitizen(member.id);
     citizen.gulagCount++;
     await citizen.save();
-    await interaction.reply(messages[getRandomInt(0, messages.length - 1)], {
+    await interaction.reply({
+      content: messages[getRandomInt(0, messages.length - 1)],
       ephemeral: false,
     });
   }
 
   @Slash('ungulag')
   async ungulag(
-    @Option('user', OptionType.USER, {
+    @SlashOption('user', {
+      type: 'USER',
       description: 'User to gulag',
       required: true,
     })
-    userId: string,
+    user: User | GuildMember,
     interaction: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
-    const member = await interaction.guild.members.fetch(userId);
+    const member = await interaction.guild.members.fetch(user);
     if (!member) {
-      await interaction.reply(`Please give a user ID as argument!`, { ephemeral: true });
+      await interaction.reply({ content: `Please give a user ID as argument!`, ephemeral: true });
       return;
     }
 
     const { gulagRole, memberRole } = server.config;
     if (!gulagRole) {
-      await interaction.reply('You have not set a gulag role in the config!', {
+      await interaction.reply({
+        content: 'You have not set a gulag role in the config!',
         ephemeral: true,
       });
       return;
@@ -198,7 +209,7 @@ export default abstract class Moderation {
 
     const volunteer = server.gulag.find((volunteer) => volunteer._id === member.id);
     if (!volunteer && !member.roles.cache.has(gulagRole)) {
-      await interaction.reply(`${member} is not in the gulag`, { ephemeral: true });
+      await interaction.reply({ content: `${member} is not in the gulag`, ephemeral: true });
       return;
     }
     const roles = volunteer?.roles || [memberRole];
@@ -230,7 +241,7 @@ export default abstract class Moderation {
 
   @Slash('purge', { description: 'Purge a bunch of messages that are totally not poggers' })
   async purge(
-    @Option('amount', {
+    @SlashOption('amount', {
       description: 'Amount of messages to delete',
       required: true,
     })
@@ -240,16 +251,19 @@ export default abstract class Moderation {
     if (!interaction.channel.isText()) {
       return;
     }
-    if (interaction.channel.type === 'dm') {
-      await interaction.reply(`I can't purge messages in a dm, baka!`, { ephemeral: true });
+    if (interaction.channel.type === 'DM') {
+      await interaction.reply({
+        content: `I can't purge messages in a dm, baka!`,
+        ephemeral: true,
+      });
       return;
     }
     if (typeof amount !== 'number') {
-      await interaction.reply(`Amount must be a number`, { ephemeral: true });
+      await interaction.reply({ content: `Amount must be a number`, ephemeral: true });
       return;
     }
     if (amount <= 0) {
-      await interaction.reply(`Amount must be greater than 0`, { ephemeral: true });
+      await interaction.reply({ content: `Amount must be greater than 0`, ephemeral: true });
       return;
     }
 

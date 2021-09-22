@@ -1,4 +1,4 @@
-import { ArgsOf, GuardFunction } from '@typeit/discord';
+import { ArgsOf, GuardFunction } from 'discordx';
 import { CategoryChannel, VoiceState } from 'discord.js';
 
 import GuardCache from '../../types/GuardCache';
@@ -18,16 +18,16 @@ export function JoinVoiceChannel(
     if (!channel) {
       return;
     }
-    if (channel instanceof CategoryChannel && channel.children.has(after.channelID)) {
-      if (!before || !channel.children.has(before.channelID)) {
+    if (channel instanceof CategoryChannel && channel.children.has(after.channelId)) {
+      if (!before || !channel.children.has(before.channelId)) {
         console.log(channel.type);
         console.log(channel.id);
         console.log(channel instanceof CategoryChannel);
         console.log(after.channel?.parent?.name);
         await next();
       }
-    } else if (after.channelID === channelId) {
-      if (!before || before.channelID !== channelId) {
+    } else if (after.channelId === channelId) {
+      if (!before || before.channelId !== channelId) {
         await next();
       }
     }

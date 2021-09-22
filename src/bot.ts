@@ -1,5 +1,5 @@
-import { ArgsOf, Discord, Guard, On, Option, OptionType, Slash } from '@typeit/discord';
-import { CommandInteraction, Message } from 'discord.js';
+import { ArgsOf, Discord, Guard, On, SlashOption, Slash } from 'discordx';
+import { CommandInteraction, GuildMember, Message, User } from 'discord.js';
 
 import { IsDMChannel } from './guards/messages/is-dm-channel';
 import { FromUser } from './guards/messages/from-user';
@@ -25,16 +25,16 @@ export class Bot {
   @Guard(IsDMChannel)
   @Guard(FromUser(process.env.OWNER_ID))
   async respondToUser(
-    @Option('user', OptionType.USER)
-    userId: string,
-    @Option('message', OptionType.STRING)
+    @SlashOption('user', { type: 'USER', required: true })
+    user: User | GuildMember,
+    @SlashOption('message', { type: 'STRING', required: true })
     message: string,
     interaction: CommandInteraction
   ): Promise<void> {
-    await sendMessageToUser(interaction.client, userId, message);
+    await sendMessageToUser(interaction.client, user.id, message);
   }
 
-  @On('message')
+  @On('messageCreate')
   async insultResponse([message]: ArgsOf<'message'>): Promise<void> {
     const searchText = message.content.toLowerCase();
     if (

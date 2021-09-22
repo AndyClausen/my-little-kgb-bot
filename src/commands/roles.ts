@@ -1,4 +1,4 @@
-import { Client, Discord, Group, Guard, Option, OptionType, Slash } from '@typeit/discord';
+import { Client, Discord, SlashGroup, Guard, SlashOption, Slash } from 'discordx';
 
 import { ReactionRole } from '../db/models/reaction-role';
 import ServerExists from '../guards/config/server-exists';
@@ -9,7 +9,7 @@ import { CommandInteraction } from 'discord.js';
 
 @Discord()
 @Guard(ServerExists, IsConfigEnabled('reactionRoles'))
-@Group('roles', 'Like normal roles, but, like, automated', {
+@SlashGroup('roles', 'Like normal roles, but, like, automated', {
   reaction: 'React to a message to get a role! How neat is that?',
   voicechat: 'Roles that are given to users when they join a specific voice channel',
 })
@@ -23,24 +23,24 @@ export default abstract class Roles {
     server.reactionRolesChannelId = interaction.channel.id;
     await server.save();
     await upsertReactionMessage(client, server);
-    await interaction.reply('Channel successfully registered!', { ephemeral: true });
+    await interaction.reply({ content: 'Channel successfully registered!', ephemeral: true });
   }
 
   @Slash('add')
-  @Group('reaction')
+  @SlashGroup('reaction')
   async add(
-    @Option('role', OptionType.ROLE, { description: 'Role to add' })
+    @SlashOption('role', { type: 'ROLE', description: 'Role to add' })
     roleId: string,
-    @Option('name', { description: 'The name of the role' })
+    @SlashOption('name', { description: 'The name of the role' })
     name: string,
-    @Option('emoji', { description: 'An emoji to use as reaction' })
+    @SlashOption('emoji', { description: 'An emoji to use as reaction' })
     emoji: string,
     interaction: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
     if (!interaction.guild.emojis.resolveIdentifier(emoji)) {
-      await interaction.reply(`Could not resolve emoji '${emoji}'`, { ephemeral: true });
+      await interaction.reply({ content: `Could not resolve emoji '${emoji}'`, ephemeral: true });
       return;
     }
 
@@ -61,9 +61,9 @@ export default abstract class Roles {
   }
 
   @Slash('remove')
-  @Group('reaction')
+  @SlashGroup('reaction')
   async remove(
-    @Option('role', OptionType.ROLE, { description: 'Role to remove' })
+    @SlashOption('role', { type: 'ROLE', description: 'Role to remove' })
     roleId: string,
     interaction: CommandInteraction,
     client: Client,
@@ -71,7 +71,10 @@ export default abstract class Roles {
   ): Promise<void> {
     const role = server.reactionRoles.find((rr) => rr._id === roleId);
     if (!role) {
-      await interaction.reply(`Could not find role with id '${roleId}'`, { ephemeral: true });
+      await interaction.reply({
+        content: `Could not find role with id '${roleId}'`,
+        ephemeral: true,
+      });
       return;
     }
 
@@ -87,7 +90,7 @@ export default abstract class Roles {
   }
 
   @Slash('list')
-  @Group('reaction')
+  @SlashGroup('reaction')
   async list(
     interaction: CommandInteraction,
     client: Client,
@@ -96,39 +99,42 @@ export default abstract class Roles {
     let msg = 'Roles: \n```\n';
     server.reactionRoles.forEach((role) => (msg += `${role._id} | ${role.name} | ${role.emoji}\n`));
     msg += '```';
-    await interaction.reply(msg, { ephemeral: true });
+    await interaction.reply({ content: msg, ephemeral: true });
   }
 
   @Slash('add')
-  @Group('voicechat')
+  @SlashGroup('voicechat')
   @Guard(ServerExists)
   async addVoiceChatRole(
-    @Option('role', OptionType.ROLE, { required: true })
+    @SlashOption('role', { type: 'ROLE', required: true })
     roleId: string,
-    @Option('channel', OptionType.CHANNEL, { required: true })
+    @SlashOption('channel', { type: 'ROLE', required: true })
     channelId: string,
     command: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
     if (!command.guild.roles.cache.has(roleId)) {
-      await command.reply(`Could not find role with id '${roleId}'`, { ephemeral: true });
+      await command.reply({ content: `Could not find role with id '${roleId}'`, ephemeral: true });
       return;
     }
     if (!command.guild.channels.cache.has(channelId)) {
-      await command.reply(`Could not find channel with id '${channelId}'`, { ephemeral: true });
+      await command.reply({
+        content: `Could not find channel with id '${channelId}'`,
+        ephemeral: true,
+      });
       return;
     }
     const channelType = command.guild.channels.cache.get(channelId).type;
     if (!['voice', 'category'].includes(channelType)) {
-      await command.reply(
-        `Channel is of type '${channelType}' - it must be either voice or category`,
-        { ephemeral: true }
-      );
+      await command.reply({
+        content: `Channel is of type '${channelType}' - it must be either voice or category`,
+        ephemeral: true,
+      });
       return;
     }
     if (server.voiceChatRoles.find((r) => r.roleId === roleId && r.channelId === channelId)) {
-      await command.reply('That voice chat role already exists!', { ephemeral: true });
+      await command.reply({ content: 'That voice chat role already exists!', ephemeral: true });
       return;
     }
 
@@ -141,30 +147,33 @@ export default abstract class Roles {
   }
 
   @Slash('remove')
-  @Group('voicechat')
+  @SlashGroup('voicechat')
   @Guard(ServerExists)
   async removeVoiceChatRole(
-    @Option('role', OptionType.ROLE, { required: true })
+    @SlashOption('role', { type: 'ROLE', required: true })
     roleId: string,
-    @Option('channel', OptionType.CHANNEL, { required: true })
+    @SlashOption('channel', { type: 'CHANNEL', required: true })
     channelId: string,
     command: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
     if (!command.guild.roles.cache.has(roleId)) {
-      await command.reply(`Could not find role with id '${roleId}'`, { ephemeral: true });
+      await command.reply({ content: `Could not find role with id '${roleId}'`, ephemeral: true });
       return;
     }
     if (!command.guild.channels.cache.has(channelId)) {
-      await command.reply(`Could not find channel with id '${channelId}'`, { ephemeral: true });
+      await command.reply({
+        content: `Could not find channel with id '${channelId}'`,
+        ephemeral: true,
+      });
       return;
     }
     const voiceChatRole = server.voiceChatRoles.find(
       (r) => r.roleId === roleId && r.channelId === channelId
     );
     if (!voiceChatRole) {
-      await command.reply('Could not find that voicechat role...', { ephemeral: true });
+      await command.reply({ content: 'Could not find that voicechat role...', ephemeral: true });
       return;
     }
 
@@ -174,7 +183,7 @@ export default abstract class Roles {
   }
 
   @Slash('list')
-  @Group('voicechat')
+  @SlashGroup('voicechat')
   @Guard(ServerExists)
   async listVoiceChatRole(
     command: CommandInteraction,
@@ -184,6 +193,6 @@ export default abstract class Roles {
     let msg = '```\n';
     server.voiceChatRoles.forEach((r) => (msg += `Role: ${r.roleId}, Channel: ${r.channelId}\n`));
     msg += '```';
-    await command.reply(msg, { ephemeral: true });
+    await command.reply({ content: msg, ephemeral: true });
   }
 }

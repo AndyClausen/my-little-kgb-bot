@@ -1,4 +1,4 @@
-import { GuardFunction } from '@typeit/discord';
+import { GuardFunction } from 'discordx';
 
 import { Config } from '../../db/models/config';
 import PropsOfType from '../../types/PropsOfType';
@@ -11,7 +11,7 @@ export default function IsConfigEnabled(
   return async (interaction, client, next, { server }) => {
     if (!server.config[key]) {
       if (interaction instanceof CommandInteraction) {
-        await interaction.reply(`${key} is disabled...`, { ephemeral: true });
+        await interaction.reply({ ephemeral: true, content: `${key} is disabled...` });
       }
       return;
     }

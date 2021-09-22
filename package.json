@@ -1,6 +1,6 @@
 {
   "name": "my-little-kgb-bot",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "scripts": {
     "start": "ts-node-dev src/index.ts"
   },
@@ -9,28 +9,28 @@
   "author": "Andy <andreas.clausen@hotmail.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   },
   "dependencies": {
-    "@typegoose/typegoose": "^7.6.0",
-    "@typeit/discord": "^5.0.13",
-    "discord.js": "github:discordjs/discord.js",
+    "@typegoose/typegoose": "^8.3.0",
+    "discord.js": "^13.1.0",
+    "discordx": "^5.9.4",
     "dotenv": "^10.0.0",
     "moment": "^2.29.1",
-    "mongoose": "5.10.18",
+    "mongoose": "6.0.7",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^10.0.0",
     "ts-node-dev": "^1.1.6"
   },
   "devDependencies": {
     "@types/mongoose": "^5.10.5",
-    "@types/node": "^14.17.1",
+    "@types/node": "^16.9.6",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
     "@typescript-eslint/parser": "^4.25.0",
     "eslint": "^7.27.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.23.3",
-    "eslint-plugin-jsdoc": "^35.0.0",
+    "eslint-plugin-jsdoc": "^36.1.0",
     "prettier": "^2.3.0",
     "tslib": "^2.2.0",
     "tslint": "^6.1.3",

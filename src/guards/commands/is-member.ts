@@ -1,4 +1,4 @@
-import { ArgsOf, GuardFunction } from '@typeit/discord';
+import { ArgsOf, GuardFunction } from 'discordx';
 
 import GuardCache from '../../types/GuardCache';
 import { CommandInteraction, GuildMember } from 'discord.js';
@@ -13,7 +13,7 @@ const IsMember: GuardFunction<ArgsOf<'message'> | CommandInteraction, GuardCache
   if (!(messageOrInteraction.member instanceof GuildMember)) {
     return;
   }
-  if (messageOrInteraction.member.id === messageOrInteraction.guild.ownerID) {
+  if (messageOrInteraction.member.id === messageOrInteraction.guild.ownerId) {
     await next();
     return;
   }
