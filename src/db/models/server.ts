@@ -1,6 +1,6 @@
 import { Snowflake } from 'discord.js';
 import { getModelForClass, prop } from '@typegoose/typegoose';
-import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
+import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
 import { Types } from 'mongoose';
 
 import { Volunteer } from './volunteer';
@@ -8,7 +8,7 @@ import { Config } from './config';
 import { ReactionRole } from './reaction-role';
 import { VoiceChatRole } from './voice-chat-role';
 
-export class Server extends TimeStamps implements Base<string> {
+export class Server extends TimeStamps {
   @prop({ type: String, required: true })
   _id!: Snowflake;
 

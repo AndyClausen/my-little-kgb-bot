@@ -1,12 +1,13 @@
 import {
-  APIMessageContentResolvable,
-  DMChannel,
   Guild,
   GuildChannel,
   Message,
   MessageOptions,
+  MessagePayload,
   NewsChannel,
+  TextBasedChannels,
   TextChannel,
+  ThreadChannel,
 } from 'discord.js';
 import { DocumentType } from '@typegoose/typegoose';
 
@@ -14,15 +15,12 @@ import { Server } from '../db/models/server';
 
 export default async function sendSystemMessage(
   guild: Guild,
-  {
-    message,
-    options,
-  }: { message: APIMessageContentResolvable | MessageOptions; options?: MessageOptions },
+  message: string | MessagePayload | MessageOptions,
   server?: DocumentType<Server>
 ): Promise<Message | Message[]> {
   const { logChannel: logChannelId } = server?.config || {};
-  let logChannel: GuildChannel;
-  let textChannel: TextChannel | NewsChannel | DMChannel;
+  let logChannel: GuildChannel | ThreadChannel;
+  let textChannel: TextBasedChannels;
   if (logChannelId) {
     logChannel = await guild.channels.cache.get(logChannelId);
     textChannel = logChannel.isText() && logChannel;
@@ -31,10 +29,10 @@ export default async function sendSystemMessage(
     textChannel = guild.publicUpdatesChannel || guild.systemChannel;
   }
   if (!textChannel) {
-    [textChannel] = guild.channels.cache
+    textChannel = guild.channels.cache
       .filter((c) => c.permissionsFor(guild.client.user).has('SEND_MESSAGES'))
-      .array()
-      .filter((c): c is TextChannel | NewsChannel => c.isText());
+      .filter((c): c is TextChannel | NewsChannel => c.isText())
+      .first();
   }
   if (!textChannel) {
     textChannel = await (await guild.fetchOwner()).createDM(true);
@@ -42,5 +40,5 @@ export default async function sendSystemMessage(
       `I had no available channel in ${guild.name} to send this, so I am sending it here instead:`
     );
   }
-  return textChannel.send(message, options);
+  return textChannel.send(message);
 }

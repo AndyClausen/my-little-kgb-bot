@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.0
+- switch to discordx
+
 ## 1.0.1
 - add support for category channels in voice chat roles
 - make member role more optional

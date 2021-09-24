@@ -1,8 +1,15 @@
 import { Base } from '@typegoose/typegoose/lib/defaultClasses';
 import { getModelForClass, prop } from '@typegoose/typegoose';
 import { Snowflake } from 'discord.js';
+import { Types } from 'mongoose';
 
-export class VoiceChatRole extends Base {
+export class VoiceChatRole implements Base {
+  _id: Types.ObjectId;
+
+  get id(): string {
+    return this._id.toString();
+  }
+
   @prop({ type: String, required: true })
   roleId!: Snowflake;
 

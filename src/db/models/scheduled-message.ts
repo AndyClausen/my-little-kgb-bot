@@ -1,8 +1,7 @@
 import { getModelForClass, prop } from '@typegoose/typegoose';
-import { Base } from '@typegoose/typegoose/lib/defaultClasses';
 import { Snowflake } from 'discord.js';
 
-export class ScheduledMessage extends Base {
+export class ScheduledMessage {
   @prop({ type: String, required: true })
   userId!: Snowflake;
 

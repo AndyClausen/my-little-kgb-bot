@@ -156,16 +156,16 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.2.tgz#423c77877d0569db20e1fc80885ac4118314010e"
   integrity sha512-eZxlbI8GZscaGS7kkc/trHTT5xgrjH3/1n2JDwusC9iahPKWMRvRjJSAN5mCXviuTGQ/lHnhvv8Q1YTpnfz9gA==
 
-"@typegoose/typegoose@^8.3.0":
-  version "8.3.0"
-  resolved "https://registry.yarnpkg.com/@typegoose/typegoose/-/typegoose-8.3.0.tgz#cdcec5afc8cc90bc719c57bb9729914ef628df76"
-  integrity sha512-KlnVD8NE/n0fLI8Fv3+9Iu8N72NUbyFX61ejhTsPq6F+w0KAjRYVRECkorqiAeuL5qnyILlOgthjNjQOXOvONQ==
+"@typegoose/typegoose@^9.0.1":
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/@typegoose/typegoose/-/typegoose-9.0.1.tgz#f8f4f02f727f0fd855241444065d92e831c1bd98"
+  integrity sha512-0yzUWeTKB/BDhdKuzkwdPDXqWp3f7Gp5u3tgFpHqmEGkGjTnXNxFOp8+QjwTb+0KXUXi8043VP07R6qSMOe2YA==
   dependencies:
     lodash "^4.17.20"
     loglevel "^1.7.0"
     reflect-metadata "^0.1.13"
     semver "^7.3.2"
-    tslib "^2.3.0"
+    tslib "^2.3.1"
 
 "@types/json-schema@^7.0.7":
   version "7.0.9"
@@ -176,13 +176,6 @@
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha1-7ihweulOEdK4J7y+UnC86n8+ce4=
-
-"@types/mongoose@^5.10.5":
-  version "5.11.97"
-  resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-5.11.97.tgz#80b0357f3de6807eb597262f52e49c3e13ee14d8"
-  integrity sha512-cqwOVYT3qXyLiGw7ueU2kX9noE8DPGRY6z8eUxudhXY8NZ7DMKYAxyZkLSevGfhCX3dO/AoX5/SO9lAzfjon0Q==
-  dependencies:
-    mongoose "*"
 
 "@types/node@*", "@types/node@^16.9.6":
   version "16.9.6"
@@ -1468,7 +1461,7 @@ mongodb@4.1.1:
   optionalDependencies:
     saslprep "^1.0.0"
 
-mongoose@*, mongoose@6.0.7:
+mongoose@6.0.7:
   version "6.0.7"
   resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-6.0.7.tgz#a933743a1e2a67519f02c58b264e6825beb9b6aa"
   integrity sha512-44STDcV6awu0zfo1Z3NyKPHZwfVrGU93/QgR0gYbt4bik/nEa7lI1RRGcq5oyGM0YE7l63i2j80v1OhvrlFvYw==
@@ -2150,7 +2143,7 @@ type-fest@^1.2.1:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-1.4.0.tgz#e9fb813fe3bf1744ec359d55d1affefa76f14be1"
   integrity sha512-yGSza74xk0UG8k+pLh5oeoYirvIiWo5t0/o3zHHAO2tRDiZcxWP7fywNlXhqb6/r6sWvwi+RsyQMWhVLe4BVuA==
 
-typescript@^4.2.4:
+typescript@^4.4.3:
   version "4.4.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.3.tgz#bdc5407caa2b109efd4f82fe130656f977a29324"
   integrity sha512-4xfscpisVgqqDfPaJo5vkd+Qd/ItkoagnHpufr+i2QCHBsNYp+G7UAoyFl8aPtx879u38wPV65rZ8qbGZijalA==

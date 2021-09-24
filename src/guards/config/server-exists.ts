@@ -2,7 +2,7 @@ import { ArgsOf, GuardFunction } from 'discordx';
 
 import ServerModel from '../../db/models/server';
 import GuardCache from '../../types/GuardCache';
-import { CommandInteraction, MessageReaction } from 'discord.js';
+import { CommandInteraction, Message, VoiceState } from 'discord.js';
 
 const ServerExists: GuardFunction<
   | ArgsOf<'message' | 'voiceStateUpdate' | 'messageReactionAdd' | 'messageReactionRemove'>
@@ -11,9 +11,11 @@ const ServerExists: GuardFunction<
 > = async (arg, client, next, nextObj) => {
   const messageOrInteraction = arg instanceof CommandInteraction ? arg : arg[0];
   const guild =
-    messageOrInteraction instanceof MessageReaction
-      ? messageOrInteraction.message.guild
-      : messageOrInteraction.guild;
+    messageOrInteraction instanceof Message ||
+    messageOrInteraction instanceof CommandInteraction ||
+    messageOrInteraction instanceof VoiceState
+      ? messageOrInteraction.guild
+      : messageOrInteraction.message.guild;
   if (!guild) {
     return;
   }

@@ -1,8 +1,8 @@
 import { getModelForClass, prop } from '@typegoose/typegoose';
 import { Snowflake } from 'discord.js';
-import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
+import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
 
-export class Volunteer extends TimeStamps implements Base<string> {
+export class Volunteer extends TimeStamps {
   @prop({ type: String })
   _id!: Snowflake;
 

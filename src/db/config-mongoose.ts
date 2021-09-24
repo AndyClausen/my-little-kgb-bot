@@ -6,13 +6,11 @@ export default async function configMongoose(
   username: string,
   password: string
 ): Promise<mongoose.Connection> {
-  const {connection} = await mongoose.connect(
-    `mongodb+srv://${username}:${password}@${hostname}/${database}?retryWrites=true`,
+  return mongoose.createConnection(
+    `mongodb+srv://${username}:${password}@${hostname}/${database}`,
     {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      retryWrites: true,
       w: 'majority',
     }
   );
-  return connection;
 }

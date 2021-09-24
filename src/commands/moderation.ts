@@ -5,8 +5,8 @@ import {
   DiscordAPIError,
   GuildChannel,
   GuildMember,
-  User,
-} from 'discord.js';
+  User, VoiceChannelResolvable
+} from "discord.js";
 
 import { IsAdmin } from '../guards/commands/is-admin';
 import getRandomInt from '../helpers/get-random-int';
@@ -45,15 +45,10 @@ export default abstract class Moderation {
         );
         return;
       }
-    } else {
-      channelFrom = interaction.guild.channels.resolve(channelFrom);
     }
 
-    channelTo = interaction.guild.channels.resolve(channelTo);
-
     if (
-      !(channelFrom instanceof BaseGuildVoiceChannel) ||
-      !(channelTo instanceof BaseGuildVoiceChannel)
+      !(channelFrom instanceof BaseGuildVoiceChannel && channelTo instanceof BaseGuildVoiceChannel)
     ) {
       await interaction.reply({
         content: `The channels _must_ be voice or stage channels!`,
@@ -73,7 +68,7 @@ export default abstract class Moderation {
       });
       await Promise.all(
         channelFrom.members.mapValues((member) => {
-          return member.voice.setChannel(channelTo);
+          return member.voice.setChannel(channelTo as VoiceChannelResolvable);
         })
       );
     } catch (e) {
@@ -124,10 +119,9 @@ export default abstract class Moderation {
       await interaction.reply({ content: `${member} is already in gulag`, ephemeral: true });
       return;
     }
-    const roles = member.roles.cache
-      .filter((role) => !role.tags?.premiumSubscriberRole)
-      .keyArray()
-      .filter((roleId) => ![interaction.guild.id, adminRole].includes(roleId));
+    const roles = [
+      ...member.roles.cache.filter((role) => !role.tags?.premiumSubscriberRole).keys(),
+    ].filter((roleId) => ![interaction.guild.id, adminRole].includes(roleId));
     if (roles.length) {
       try {
         await member.roles.remove(roles, 'gulag');
@@ -159,7 +153,7 @@ export default abstract class Moderation {
     server.gulag.push(volunteer);
     await server.save();
 
-    await member.voice?.kick('gulag');
+    await member.voice?.disconnect('gulag');
 
     const messages = [
       `Bend over, ${member}, and get ready for the Glorious Leader`,

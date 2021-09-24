@@ -22,14 +22,12 @@ export default class RegisterServer {
       } as Server);
       await sendSystemMessage(
         guild,
-        { message: `Hello! Please configure me with \`!config\` so I can start servicing you 😊` },
+        `Hello! Please configure me with \`!config\` so I can start servicing you 😊`,
         server
       );
     } catch (e) {
       console.error(e);
-      await sendSystemMessage(guild, {
-        message: 'I have already been initialized here! Please contact Andy.',
-      });
+      await sendSystemMessage(guild, 'I have already been initialized here! Please contact Andy.');
     }
   }
 

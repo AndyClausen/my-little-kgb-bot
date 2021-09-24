@@ -1,4 +1,13 @@
-import { SlashChoice, Client, Discord, SlashGroup, Guard, SlashOption, Slash } from 'discordx';
+import {
+  SlashChoice,
+  Client,
+  Discord,
+  SlashGroup,
+  Guard,
+  SlashOption,
+  Slash,
+  SlashChoicesType,
+} from 'discordx';
 import { DocumentType } from '@typegoose/typegoose';
 
 import ConfigModel, { Config as ConfigClass } from '../db/models/config';
@@ -35,7 +44,7 @@ export default class Config {
     @SlashChoice(
       Object.keys(ConfigModel.schema.paths)
         .filter(ConfigClass.isBooleanProp)
-        .reduce<any>((obj, key) => {
+        .reduce<SlashChoicesType>((obj, key) => {
           obj[key] = key;
           return obj;
         }, {})
@@ -53,7 +62,7 @@ export default class Config {
   @Guard(IsValidKey)
   async disable(
     @SlashChoice(
-      Object.keys(ConfigModel.schema.paths).reduce<any>((obj, key) => {
+      Object.keys(ConfigModel.schema.paths).reduce<SlashChoicesType>((obj, key) => {
         obj[key] = key;
         return obj;
       }, {})
@@ -91,7 +100,7 @@ export default class Config {
   @Guard(IsValidKey)
   async set(
     @SlashChoice(
-      Object.keys(ConfigModel.schema.paths).reduce<any>((obj, key) => {
+      Object.keys(ConfigModel.schema.paths).reduce<SlashChoicesType>((obj, key) => {
         obj[key] = key;
         return obj;
       }, {})
@@ -155,7 +164,7 @@ export default class Config {
   @Guard(IsValidKey)
   async get(
     @SlashChoice(
-      Object.keys(ConfigModel.schema.paths).reduce<any>((obj, key) => {
+      Object.keys(ConfigModel.schema.paths).reduce<SlashChoicesType>((obj, key) => {
         obj[key] = key;
         return obj;
       }, {})

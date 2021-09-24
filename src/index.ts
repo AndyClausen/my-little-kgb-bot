@@ -50,7 +50,7 @@ async function start() {
   ]);
 
   client.once('ready', async () => {
-    client.initApplicationCommands();
+    await client.initApplicationCommands();
   });
 
   client.on('interaction', async (interaction) => {

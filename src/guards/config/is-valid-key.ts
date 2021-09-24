@@ -1,5 +1,5 @@
 import ConfigModel, { Config } from '../../db/models/config';
-import { GuardFunction, OptionType } from '@typeit/discord';
+import { GuardFunction } from 'discordx';
 import { CommandInteraction } from 'discord.js';
 
 const IsValidKey: GuardFunction<CommandInteraction> = async (
@@ -7,13 +7,7 @@ const IsValidKey: GuardFunction<CommandInteraction> = async (
   client,
   next
 ) => {
-  const key = (
-    interaction.options[0]?.type === 'SUB_COMMAND'
-      ? interaction.options[0].options
-      : interaction.options
-  )
-    .find((o) => o.name === 'key' && o.type === OptionType.STRING)
-    ?.value?.toString();
+  const key = interaction.options.getString('key');
   if (!Config.isValidKey(key)) {
     await interaction.reply(
       `Invalid key '${key}'! Available keys are:\n${Object.keys(ConfigModel.schema.paths)}`

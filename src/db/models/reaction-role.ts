@@ -1,8 +1,7 @@
 import { Snowflake } from 'discord.js';
-import { Base } from '@typegoose/typegoose/lib/defaultClasses';
 import { prop } from '@typegoose/typegoose';
 
-export class ReactionRole extends Base<string> {
+export class ReactionRole {
   @prop({ type: String, required: true })
   _id!: Snowflake;
 

@@ -26,15 +26,15 @@ export default class Useful {
     await sendSystemMessage(
       interaction.guild,
       {
-        message: {
-          embed: new MessageEmbed({
+        embeds: [
+          new MessageEmbed({
             description: `An invite link has been created by ${interaction.member}`,
             author: {
               name: interaction.user.tag,
               iconURL: interaction.user.avatarURL({ dynamic: true }),
             },
           }),
-        },
+        ],
       },
       server
     );
@@ -44,9 +44,6 @@ export default class Useful {
       maxAge: 3600,
       reason: interaction.user.tag,
     });
-
-    const dmChannel = await interaction.user.createDM();
-    await dmChannel.send(invite.url);
-    await interaction.reply({ content: 'Sent you an invite in dm uwu', ephemeral: true });
+    await interaction.reply({ content: invite.url, ephemeral: true });
   }
 }
