@@ -640,10 +640,10 @@ discord.js@^13.1.0:
     node-fetch "^2.6.1"
     ws "^7.5.1"
 
-discordx@^6.0.3:
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/discordx/-/discordx-6.0.3.tgz#b2cd9b368050a046f8da45c267d44a47a3f267a5"
-  integrity sha512-eR6mn2ceqJmt3bnF3Kq4IvRVFUHFAvUNqz8/z+etki0657FWebdecJXvWHP9n96/FL3r5FydryaLQ5LN3dDR9A==
+discordx@^6.0.5:
+  version "6.0.5"
+  resolved "https://registry.yarnpkg.com/discordx/-/discordx-6.0.5.tgz#eba5bf53d09daa9720c639ced38d1a6de77548cd"
+  integrity sha512-+lRvPXwQ2UvZfQ13GsPpp6jrc/BrQYqowZ1LEoW/Aq25OgVOxIdzAiS23uhuVA8RngKaApGMktW1wozwhBmEyQ==
   dependencies:
     discord.js "^13.1.0"
     glob "^7.2.0"
