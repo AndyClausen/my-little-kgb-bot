@@ -4,22 +4,22 @@ import GuardCache from '../../types/GuardCache';
 import { CommandInteraction, GuildMember } from 'discord.js';
 
 export const IsAdmin: GuardFunction<CommandInteraction, GuardCache> = async (
-  message,
+  interaction,
   client,
   next,
   { server }
 ) => {
-  if (!message.guild || !(message.member instanceof GuildMember)) {
+  if (!interaction.guild || !(interaction.member instanceof GuildMember)) {
     return;
   }
-  if (message.member.id === message.guild.ownerId) {
+  if (interaction.member.id === interaction.guild.ownerId) {
     await next();
     return;
   }
 
   const adminRole = server.config.adminRole;
-  if (!adminRole || !message.member.roles.cache.has(adminRole)) {
-    await message.reply(`You're not my Discord supervisor!`);
+  if (!adminRole || !interaction.member.roles.cache.has(adminRole)) {
+    await interaction.reply(`You're not my Discord supervisor!`);
     return;
   }
 

@@ -51,6 +51,9 @@ async function start() {
 
   client.once('ready', async () => {
     await client.initApplicationCommands();
+    await client.initApplicationPermissions();
+
+    console.log('Bot ready!');
   });
 
   client.on('interaction', async (interaction) => {
