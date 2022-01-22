@@ -1,11 +1,11 @@
 import { Client, Discord, SlashGroup, Guard, SlashOption, Slash } from 'discordx';
+import { CommandInteraction, Role } from 'discord.js';
 
 import { ReactionRole } from '../db/models/reaction-role';
 import ServerExists from '../guards/config/server-exists';
 import IsConfigEnabled from '../guards/config/is-config-enabled';
 import GuardCache from '../types/GuardCache';
 import upsertReactionMessage from '../helpers/upsert-reaction-message';
-import { CommandInteraction } from 'discord.js';
 
 @Discord()
 @Guard(ServerExists, IsConfigEnabled('reactionRoles'))
@@ -15,6 +15,7 @@ import { CommandInteraction } from 'discord.js';
 })
 export default abstract class Roles {
   @Slash('register', { description: 'Register a channel to post the reaction roles message' })
+  @SlashGroup('reaction')
   async register(
     interaction: CommandInteraction,
     client: Client,
@@ -30,7 +31,7 @@ export default abstract class Roles {
   @SlashGroup('reaction')
   async add(
     @SlashOption('role', { type: 'ROLE', description: 'Role to add' })
-    roleId: string,
+    role: Role,
     @SlashOption('name', { description: 'The name of the role' })
     name: string,
     @SlashOption('emoji', { description: 'An emoji to use as reaction' })
@@ -45,7 +46,7 @@ export default abstract class Roles {
     }
 
     const reactionRole: ReactionRole = {
-      _id: roleId,
+      _id: role.id,
       name,
       emoji,
     };
@@ -64,21 +65,21 @@ export default abstract class Roles {
   @SlashGroup('reaction')
   async remove(
     @SlashOption('role', { type: 'ROLE', description: 'Role to remove' })
-    roleId: string,
+    role: Role,
     interaction: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
-    const role = server.reactionRoles.find((rr) => rr._id === roleId);
-    if (!role) {
+    const reactionRole = server.reactionRoles.find((rr) => rr._id === role.id);
+    if (!reactionRole) {
       await interaction.reply({
-        content: `Could not find role with id '${roleId}'`,
+        content: `Could not find reaction role with id '${role.id}'`,
         ephemeral: true,
       });
       return;
     }
 
-    server.reactionRoles.remove(role);
+    server.reactionRoles.remove(reactionRole);
     await server.save();
     await upsertReactionMessage(client, server);
 
@@ -106,9 +107,9 @@ export default abstract class Roles {
   @SlashGroup('voicechat')
   @Guard(ServerExists)
   async addVoiceChatRole(
-    @SlashOption('role', { type: 'ROLE', required: true })
+    @SlashOption('role', { type: 'ROLE' })
     roleId: string,
-    @SlashOption('channel', { type: 'ROLE', required: true })
+    @SlashOption('channel', { type: 'ROLE' })
     channelId: string,
     command: CommandInteraction,
     client: Client,
@@ -150,9 +151,9 @@ export default abstract class Roles {
   @SlashGroup('voicechat')
   @Guard(ServerExists)
   async removeVoiceChatRole(
-    @SlashOption('role', { type: 'ROLE', required: true })
+    @SlashOption('role', { type: 'ROLE' })
     roleId: string,
-    @SlashOption('channel', { type: 'CHANNEL', required: true })
+    @SlashOption('channel', { type: 'CHANNEL' })
     channelId: string,
     command: CommandInteraction,
     client: Client,

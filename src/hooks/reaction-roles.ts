@@ -1,16 +1,14 @@
 import { ArgsOf, Client, Discord, Guard, On } from 'discordx';
 
-import { NotBotReaction } from '../guards/reactions/not-bot-reaction';
 import ServerExists from '../guards/config/server-exists';
 import IsConfigEnabled from '../guards/config/is-config-enabled';
 import IsReactionRoleMessage from '../guards/reactions/is-reaction-role-message';
 import GuardCache from '../types/GuardCache';
 
 @Discord()
-@Guard(NotBotReaction, ServerExists)
+@Guard(ServerExists, IsConfigEnabled('reactionRoles'), IsReactionRoleMessage)
 export default abstract class ReactionRoles {
   @On('messageReactionAdd')
-  @Guard(NotBotReaction, ServerExists, IsConfigEnabled('reactionRoles'), IsReactionRoleMessage)
   async addRoleToUser(
     [messageReaction, user]: ArgsOf<'messageReactionAdd'>,
     client: Client,
@@ -27,7 +25,6 @@ export default abstract class ReactionRoles {
   }
 
   @On('messageReactionRemove')
-  @Guard(NotBotReaction, ServerExists, IsConfigEnabled('reactionRoles'), IsReactionRoleMessage)
   async removeRoleFromUser(
     [messageReaction, user]: ArgsOf<'messageReactionRemove'>,
     client: Client,

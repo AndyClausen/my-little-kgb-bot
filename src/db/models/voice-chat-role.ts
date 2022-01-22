@@ -1,5 +1,6 @@
 import { Base } from '@typegoose/typegoose/lib/defaultClasses';
-import { getModelForClass, prop } from '@typegoose/typegoose';
+import Typegoose from '@typegoose/typegoose';
+const { getModelForClass, prop } = Typegoose;
 import { Snowflake } from 'discord.js';
 import { Types } from 'mongoose';
 

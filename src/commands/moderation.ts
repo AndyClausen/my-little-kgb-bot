@@ -1,12 +1,12 @@
 import { Client, Discord, Guard, SlashOption, Slash } from 'discordx';
 import {
-  BaseGuildVoiceChannel,
   CommandInteraction,
   DiscordAPIError,
   GuildChannel,
   GuildMember,
-  User, VoiceChannelResolvable
-} from "discord.js";
+  User,
+  VoiceChannelResolvable,
+} from 'discord.js';
 
 import { IsAdmin } from '../guards/commands/is-admin';
 import getRandomInt from '../helpers/get-random-int';
@@ -14,16 +14,17 @@ import ServerExists from '../guards/config/server-exists';
 import { Volunteer } from '../db/models/volunteer';
 import { getOrCreateCitizen } from '../db/get-or-create-citizen';
 import GuardCache from '../types/GuardCache';
+import { IsMod } from '../guards/commands/is-mod';
 
 @Discord()
-@Guard(ServerExists, IsAdmin)
+@Guard(ServerExists, IsMod)
 export default abstract class Moderation {
+  @Guard(IsAdmin)
   @Slash('move', { description: 'Move all users from one voice channel to another' })
   async bulkMove(
     @SlashOption('to', {
       type: 'CHANNEL',
       description: 'Channel to move to',
-      required: true,
     })
     channelTo: GuildChannel,
     @SlashOption('from', {
@@ -47,9 +48,7 @@ export default abstract class Moderation {
       }
     }
 
-    if (
-      !(channelFrom instanceof BaseGuildVoiceChannel && channelTo instanceof BaseGuildVoiceChannel)
-    ) {
+    if (!(channelFrom.isVoice() && channelTo.isVoice())) {
       await interaction.reply({
         content: `The channels _must_ be voice or stage channels!`,
         ephemeral: true,
@@ -72,6 +71,9 @@ export default abstract class Moderation {
         })
       );
     } catch (e) {
+      if (!(e instanceof Error)) {
+        throw e;
+      }
       if (e.name === 'missingConnectPerm') {
         await interaction.reply({
           content: `Member <@${e.message}> does not have permission to connect to ${channelTo.name}`,
@@ -88,12 +90,12 @@ export default abstract class Moderation {
     });
   }
 
+  @Guard(IsAdmin)
   @Slash('gulag')
   async gulag(
     @SlashOption('user', {
       type: 'USER',
       description: 'User to gulag',
-      required: true,
     })
     user: User | GuildMember,
     interaction: CommandInteraction,
@@ -179,7 +181,6 @@ export default abstract class Moderation {
     @SlashOption('user', {
       type: 'USER',
       description: 'User to gulag',
-      required: true,
     })
     user: User | GuildMember,
     interaction: CommandInteraction,
@@ -228,16 +229,15 @@ export default abstract class Moderation {
     ];
 
     const citizen = await getOrCreateCitizen(member.id);
-    citizen.gulagCount--;
     await citizen.save();
     await interaction.reply(messages[getRandomInt(0, messages.length - 1)]);
   }
 
+  @Guard(IsAdmin)
   @Slash('purge', { description: 'Purge a bunch of messages that are totally not poggers' })
   async purge(
     @SlashOption('amount', {
       description: 'Amount of messages to delete',
-      required: true,
     })
     amount: number,
     interaction: CommandInteraction

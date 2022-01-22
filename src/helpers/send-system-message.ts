@@ -1,13 +1,11 @@
 import {
   Guild,
-  GuildChannel,
   Message,
   MessageOptions,
   MessagePayload,
   NewsChannel,
-  TextBasedChannels,
+  TextBasedChannel,
   TextChannel,
-  ThreadChannel,
 } from 'discord.js';
 import { DocumentType } from '@typegoose/typegoose';
 
@@ -18,13 +16,9 @@ export default async function sendSystemMessage(
   message: string | MessagePayload | MessageOptions,
   server?: DocumentType<Server>
 ): Promise<Message | Message[]> {
-  const { logChannel: logChannelId } = server?.config || {};
-  let logChannel: GuildChannel | ThreadChannel;
-  let textChannel: TextBasedChannels;
-  if (logChannelId) {
-    logChannel = await guild.channels.cache.get(logChannelId);
-    textChannel = logChannel.isText() && logChannel;
-  }
+  const { logChannel: logChannelId } = server?.config ?? {};
+  const logChannel = logChannelId && guild.channels.cache.get(logChannelId);
+  let textChannel: TextBasedChannel = logChannel?.isText() && logChannel;
   if (!textChannel) {
     textChannel = guild.publicUpdatesChannel || guild.systemChannel;
   }

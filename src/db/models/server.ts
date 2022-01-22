@@ -1,7 +1,8 @@
 import { Snowflake } from 'discord.js';
-import { getModelForClass, prop } from '@typegoose/typegoose';
+import Typegoose from '@typegoose/typegoose';
+const { getModelForClass, prop } = Typegoose;
 import { TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
-import { Types } from 'mongoose';
+import Mongoose from 'mongoose';
 
 import { Volunteer } from './volunteer';
 import { Config } from './config';
@@ -16,10 +17,10 @@ export class Server extends TimeStamps {
   config!: Config;
 
   @prop({ type: Volunteer, default: [], required: true })
-  gulag!: Types.Array<Volunteer>;
+  gulag!: Mongoose.Types.Array<Volunteer>;
 
   @prop({ type: ReactionRole, default: [], required: true })
-  reactionRoles!: Types.Array<ReactionRole>;
+  reactionRoles!: Mongoose.Types.Array<ReactionRole>;
 
   @prop({ type: String, required: false })
   reactionRolesMessageId?: Snowflake;
@@ -28,7 +29,7 @@ export class Server extends TimeStamps {
   reactionRolesChannelId?: Snowflake;
 
   @prop({ type: VoiceChatRole, default: [], required: true })
-  voiceChatRoles!: Types.Array<VoiceChatRole>;
+  voiceChatRoles!: Mongoose.Types.Array<VoiceChatRole>;
 }
 
 const ServerModel = getModelForClass(Server);

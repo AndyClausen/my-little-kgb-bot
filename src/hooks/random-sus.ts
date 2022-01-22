@@ -6,7 +6,7 @@ import ServerExists from '../guards/config/server-exists';
 
 @Discord()
 export default class RandomSus {
-  @On('message')
+  @On('messageCreate')
   @Guard(ServerExists, IsConfigEnabled('randomSus'))
   async randomSus([message]: Message[]): Promise<void> {
     const roll = Math.random();

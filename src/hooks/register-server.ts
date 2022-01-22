@@ -22,7 +22,7 @@ export default class RegisterServer {
       } as Server);
       await sendSystemMessage(
         guild,
-        `Hello! Please configure me with \`!config\` so I can start servicing you 😊`,
+        `Hello! Please configure me with \`/config\` so I can start servicing you 😊`,
         server
       );
     } catch (e) {

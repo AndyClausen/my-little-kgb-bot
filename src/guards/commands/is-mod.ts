@@ -3,7 +3,7 @@ import { CommandInteraction, GuildMember } from 'discord.js';
 
 import GuardCache from '../../types/GuardCache';
 
-export const IsAdmin: GuardFunction<CommandInteraction, GuardCache> = async (
+export const IsMod: GuardFunction<CommandInteraction, GuardCache> = async (
   message,
   client,
   next,
@@ -17,8 +17,11 @@ export const IsAdmin: GuardFunction<CommandInteraction, GuardCache> = async (
     return;
   }
 
-  const { adminRole } = server.config;
-  if (!adminRole || !message.member.roles.cache.has(adminRole)) {
+  const { modRole, adminRole } = server.config;
+  if (
+    (!modRole || !message.member.roles.cache.has(modRole)) &&
+    (!adminRole || !message.member.roles.cache.has(adminRole))
+  ) {
     await message.reply(`You're not my Discord supervisor!`);
     return;
   }

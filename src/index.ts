@@ -1,17 +1,18 @@
 import 'reflect-metadata';
 import { Client } from 'discordx';
+import { importx, dirname } from '@discordx/importer';
 import { config, parse } from 'dotenv';
 import { promises as fs } from 'fs';
+import { Intents } from 'discord.js';
 
 import configMongoose from './db/config-mongoose';
 import createScheduledMessage from './helpers/create-scheduled-message';
 import ScheduledMessageModel from './db/models/scheduled-message';
 import server from './db/models/server';
 import { NotBot } from './guards/messages/not-bot';
-import { Intents } from 'discord.js';
-import * as Path from 'path';
 
 async function start() {
+  console.log('Reading env...');
   try {
     const envFile = await fs.readFile('.env');
     config(parse(envFile));
@@ -20,12 +21,8 @@ async function start() {
     console.log('Failed to read env file, skipping...');
   }
 
+  console.log('Creating client...');
   const client = new Client({
-    classes: [
-      // language=file-reference
-      ...[`bot.ts`].map((s) => `${__dirname}/` + s),
-      ...[Path.join(__dirname, 'commands', '*.ts'), Path.join(__dirname, 'hooks', '*.ts')],
-    ],
     guards: [NotBot],
     intents: [
       Intents.FLAGS.GUILDS,
@@ -38,7 +35,25 @@ async function start() {
       Intents.FLAGS.DIRECT_MESSAGES,
     ],
     botGuilds: process.env.TEST_SERVER ? [process.env.TEST_SERVER] : undefined,
+    ...(process.env.NODE_ENV === 'development' && { silent: false }),
   });
+  await importx(
+    `${dirname(import.meta.url)}/bot.{ts,js}`,
+    `${dirname(import.meta.url)}/{hooks,commands}/**/*.{ts,js}`
+  );
+
+  console.log('Initializing listeners...');
+  client.once('ready', async () => {
+    console.log('Initializing commands...');
+    await client.initApplicationCommands();
+    console.log('Commands are ready.');
+  });
+
+  client.on('interactionCreate', async (interaction) => {
+    await client.executeInteraction(interaction);
+  });
+
+  console.log('Logging into discord and mongodb...');
   await Promise.all([
     client.login(process.env.DISCORD_TOKEN),
     configMongoose(
@@ -49,18 +64,12 @@ async function start() {
     ),
   ]);
 
-  client.once('ready', async () => {
-    await client.initApplicationCommands();
-  });
-
-  client.on('interaction', async (interaction) => {
-    client.executeInteraction(interaction);
-  });
-
+  console.log('Scheduling messages...');
   // scheduled messages
   const scheduledMessages = await ScheduledMessageModel.find();
   scheduledMessages.map((msg) => createScheduledMessage(client, msg));
 
+  console.log('Initializing reaction roles...');
   const servers = await server.find();
   await Promise.all(
     servers
@@ -73,12 +82,13 @@ async function start() {
       })
   );
 
+  console.log('Setting presence...');
   client.user.setPresence({
     activities:
       process.env.NODE_ENV === 'development'
         ? [{ type: 'WATCHING', name: 'Andy develop me' }]
-        : [{ type: 'LISTENING', name: '/help' }],
+        : [{ type: 'WATCHING', name: 'over the Gulag' }],
   });
 }
 
-start().then(() => console.log('Bot is now running!'));
+await start().then(() => console.log('Bot is now running!'));

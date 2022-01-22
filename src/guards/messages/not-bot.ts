@@ -4,7 +4,6 @@ import {
   CommandInteraction,
   ContextMenuInteraction,
   Message,
-  MessageReaction,
   SelectMenuInteraction,
   VoiceState,
 } from 'discord.js';
@@ -13,31 +12,28 @@ import {
 // Modified @oceanroleplay
 
 export const NotBot: GuardFunction<
-  | ArgsOf<'messageCreate' | 'messageReactionAdd' | 'voiceStateUpdate'>
+  | ArgsOf<'messageCreate' | 'messageReactionAdd' | 'messageReactionRemove' | 'voiceStateUpdate'>
   | CommandInteraction
   | ContextMenuInteraction
   | SelectMenuInteraction
   | ButtonInteraction
   | SimpleCommandMessage
 > = async (arg, client, next) => {
-  const argObj = arg instanceof Array ? arg[0] : arg;
+  const argObj = arg instanceof Array ? arg[1] : arg;
   const user =
     argObj instanceof CommandInteraction
       ? argObj.user
-      : argObj instanceof MessageReaction
-      ? argObj.message.author
-      : argObj instanceof VoiceState
-      ? argObj.member?.user
       : argObj instanceof Message
       ? argObj.author
       : argObj instanceof SimpleCommandMessage
-      ? argObj.message.author
+      ? argObj.message?.author
       : argObj instanceof CommandInteraction ||
         argObj instanceof ContextMenuInteraction ||
         argObj instanceof SelectMenuInteraction ||
-        argObj instanceof ButtonInteraction
+        argObj instanceof ButtonInteraction ||
+        argObj instanceof VoiceState
       ? argObj.member?.user
-      : argObj.message.author;
+      : argObj;
   if (!user?.bot) {
     await next();
   }

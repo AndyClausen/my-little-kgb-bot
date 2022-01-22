@@ -1,6 +1,6 @@
-import { Snowflake } from "discord.js";
-import { DocumentType } from "@typegoose/typegoose";
-import CitizenModel, { Citizen } from "./models/citizen";
+import { Snowflake } from 'discord.js';
+import { DocumentType } from '@typegoose/typegoose';
+import CitizenModel, { Citizen } from './models/citizen';
 
 export async function getOrCreateCitizen(userId: Snowflake): Promise<DocumentType<Citizen>> {
   let citizen = await CitizenModel.findById(userId);

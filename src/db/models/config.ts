@@ -1,4 +1,5 @@
-import { getModelForClass, prop, ModelOptions } from '@typegoose/typegoose';
+import Typegoose from '@typegoose/typegoose';
+const { getModelForClass, prop, ModelOptions } = Typegoose;
 import { Snowflake } from 'discord.js';
 
 import PropsOfType from '../../types/PropsOfType';
@@ -10,6 +11,9 @@ export class Config {
 
   @prop({ type: () => String, required: false })
   adminRole?: Snowflake;
+
+  @prop({ type: () => String, required: false })
+  modRole?: Snowflake;
 
   @prop({ type: () => String, required: false })
   gulagRole?: Snowflake;
@@ -37,6 +41,7 @@ export class Config {
     const props: Array<PropsOfType<Config, string> | string> = [
       'memberRole',
       'adminRole',
+      'modRole',
       'gulagRole',
       'logChannel',
     ];
@@ -48,7 +53,7 @@ export class Config {
     return props.includes(key);
   }
 
-  static isBooleanProp(key: keyof Config): key is PropsOfType<Config, boolean> {
+  static isBooleanProp(this: void, key: keyof Config): key is PropsOfType<Config, boolean> {
     const props: Array<PropsOfType<Config, boolean> | string> = [
       'randomSus',
       'russianRoulette',

@@ -1,27 +1,23 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
-    "target": "ES2020",
+    "module": "ESNext",
+    "target": "ESNext",
     "noImplicitAny": true,
     "sourceMap": true,
     "sourceRoot": "src",
     "outDir": "dist",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "esModuleInterop": true,
     "importHelpers": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "lib": [
-      "ES2020",
-      "esnext.asynciterable"
-    ],
+    "lib": ["ES2021"],
     "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
       "*": ["node_modules/*"]
     }
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

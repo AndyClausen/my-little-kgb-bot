@@ -9,6 +9,7 @@ import {
   SlashChoicesType,
 } from 'discordx';
 import { DocumentType } from '@typegoose/typegoose';
+import { CommandInteraction } from 'discord.js';
 
 import ConfigModel, { Config as ConfigClass } from '../db/models/config';
 import { Server } from '../db/models/server';
@@ -16,7 +17,6 @@ import IsValidKey from '../guards/config/is-valid-key';
 import ServerExists from '../guards/config/server-exists';
 import GuardCache from '../types/GuardCache';
 import { IsAdmin } from '../guards/commands/is-admin';
-import { CommandInteraction } from 'discord.js';
 
 @Discord()
 @Guard(ServerExists, IsAdmin)
@@ -49,7 +49,7 @@ export default class Config {
           return obj;
         }, {})
     )
-    @SlashOption('key', { type: 'STRING', required: true })
+    @SlashOption('key', { type: 'STRING' })
     key: keyof ConfigClass,
     interaction: CommandInteraction,
     client: Client,
@@ -67,7 +67,7 @@ export default class Config {
         return obj;
       }, {})
     )
-    @SlashOption('key', { type: 'STRING', required: true })
+    @SlashOption('key', { type: 'STRING' })
     key: keyof ConfigClass,
     interaction: CommandInteraction,
     client: Client,
@@ -105,9 +105,9 @@ export default class Config {
         return obj;
       }, {})
     )
-    @SlashOption('key', { type: 'STRING', required: true })
+    @SlashOption('key', { type: 'STRING' })
     key: keyof ConfigClass,
-    @SlashOption('value', { required: true })
+    @SlashOption('value', { type: 'STRING' })
     value: string,
     interaction: CommandInteraction,
     client: Client,
@@ -169,7 +169,7 @@ export default class Config {
         return obj;
       }, {})
     )
-    @SlashOption('key', { type: 'STRING', required: true })
+    @SlashOption('key', { type: 'STRING' })
     key: keyof ConfigClass,
     interaction: CommandInteraction,
     client: Client,

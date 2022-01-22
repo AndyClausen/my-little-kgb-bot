@@ -1,10 +1,10 @@
 import { Client, Discord, Guard, SlashOption, Slash } from 'discordx';
+import { CommandInteraction, GuildMember, User } from 'discord.js';
 
 import IsConfigEnabled from '../guards/config/is-config-enabled';
 import ServerExists from '../guards/config/server-exists';
 import { getOrCreateCitizen } from '../db/get-or-create-citizen';
 import GuardCache from '../types/GuardCache';
-import { CommandInteraction, GuildMember, User } from 'discord.js';
 
 @Discord()
 export default class Fun {
@@ -12,7 +12,7 @@ export default class Fun {
     description: 'Make a game out of shaming someone for talking with their mic muted',
   })
   async ding(
-    @SlashOption('user', { type: 'USER', required: true })
+    @SlashOption('user', { type: 'USER' })
     user: User | GuildMember,
     interaction: CommandInteraction
   ): Promise<void> {
@@ -25,13 +25,13 @@ export default class Fun {
     citizen.dings++;
     await citizen.save();
     await interaction.reply(
-      `DING!\n${member} has now talked ${citizen.dings} times with his mic muted`
+      `DING!\n${member} has now talked ${citizen.dings} times with their mic muted`
     );
   }
 
   @Slash('unding', { description: 'When you ding someone by mistake' })
   async unding(
-    @SlashOption('user', { type: 'USER', required: true })
+    @SlashOption('user', { type: 'USER' })
     user: User | GuildMember,
     interaction: CommandInteraction
   ): Promise<void> {

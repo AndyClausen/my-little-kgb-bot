@@ -1,4 +1,4 @@
-import * as moment from "moment";
+import moment from 'moment';
 
 export default function getMillisUntilTime(hours: number, minutes: number): number {
   const nextTime = moment().hours(hours).minutes(minutes).startOf('minute');

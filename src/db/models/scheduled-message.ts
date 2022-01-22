@@ -1,4 +1,5 @@
-import { getModelForClass, prop } from '@typegoose/typegoose';
+import Typegoose from '@typegoose/typegoose';
+const { getModelForClass, prop } = Typegoose;
 import { Snowflake } from 'discord.js';
 
 export class ScheduledMessage {

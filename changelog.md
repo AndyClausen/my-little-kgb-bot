@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0
+- switch from cjs to esm
+- update dependencies
+- add a moderator role for ungulag
+
 ## 1.1.0
 - switch to discordx
 

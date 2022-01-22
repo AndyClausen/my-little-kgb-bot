@@ -1,5 +1,6 @@
 import { Snowflake } from 'discord.js';
-import { prop } from '@typegoose/typegoose';
+import Typegoose from '@typegoose/typegoose';
+const { prop } = Typegoose;
 
 export class ReactionRole {
   @prop({ type: String, required: true })

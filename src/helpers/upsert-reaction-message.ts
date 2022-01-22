@@ -9,8 +9,12 @@ export default async function upsertReactionMessage(
   server: DocumentType<Server>
 ): Promise<void> {
   const { reactionRolesMessageId, reactionRoles, reactionRolesChannelId } = server;
-  const roleChannel = (await client.channels.fetch(reactionRolesChannelId)) as TextChannel;
-
+  let roleChannel;
+  try {
+    roleChannel = (await client.channels.fetch(reactionRolesChannelId)) as TextChannel;
+  } catch (e) {
+    return;
+  }
   if (!roleChannel) {
     return;
   }

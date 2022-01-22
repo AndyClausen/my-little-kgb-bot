@@ -7,7 +7,7 @@ import sendMessageToUser from './helpers/send-message-to-user';
 
 @Discord()
 export class Bot {
-  @On('message')
+  @On('messageCreate')
   @Guard(IsDMChannel)
   async sendToAndy([message]: [Message]): Promise<void> {
     if (message.author.id === process.env.OWNER_ID) {
@@ -25,9 +25,9 @@ export class Bot {
   @Guard(IsDMChannel)
   @Guard(FromUser(process.env.OWNER_ID))
   async respondToUser(
-    @SlashOption('user', { type: 'USER', required: true })
+    @SlashOption('user', { type: 'USER' })
     user: User | GuildMember,
-    @SlashOption('message', { type: 'STRING', required: true })
+    @SlashOption('message', { type: 'STRING' })
     message: string,
     interaction: CommandInteraction
   ): Promise<void> {
