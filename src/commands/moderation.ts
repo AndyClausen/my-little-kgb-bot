@@ -121,34 +121,28 @@ export default abstract class Moderation {
       await interaction.reply({ content: `${member} is already in gulag`, ephemeral: true });
       return;
     }
-    const roles = [
+    const [roles, immutableRoles] = [
       ...member.roles.cache.filter((role) => !role.tags?.premiumSubscriberRole).keys(),
-    ].filter((roleId) => ![interaction.guild.id, adminRole].includes(roleId));
+    ].reduce<[string[], string[]]>(
+      ([a, b], roleId) => {
+        ([interaction.guild.id, adminRole].includes(roleId) ? b : a).push(roleId);
+        return [a, b];
+      },
+      [[], []]
+    );
     if (roles.length) {
       try {
-        await member.roles.remove(roles, 'gulag');
+        await member.roles.set([...immutableRoles, gulagRole], 'gulag');
       } catch (e) {
         if (e instanceof DiscordAPIError && e.message === 'Missing Permissions') {
           await interaction.reply({
-            content: `I don't have permissions to remove one or more of this person's roles!`,
+            content: `I don't have permissions to set one or more of this person's roles!`,
             ephemeral: true,
           });
           return;
         }
         throw e;
       }
-    }
-    try {
-      await member.roles.add(gulagRole, 'gulag');
-    } catch (e) {
-      if (e instanceof DiscordAPIError && e.message === 'Missing Permissions') {
-        await interaction.reply({
-          content: `I don't have permissions to add the gulag role to this person!`,
-          ephemeral: true,
-        });
-        return;
-      }
-      throw e;
     }
 
     const volunteer: Volunteer = { _id: member.id, roles: roles };
@@ -207,11 +201,12 @@ export default abstract class Moderation {
       await interaction.reply({ content: `${member} is not in the gulag`, ephemeral: true });
       return;
     }
-    const roles = volunteer?.roles || [memberRole];
-    if (roles.filter((r) => !!r).length) {
-      await member.roles.add(roles, 'ungulag');
+    const roles = (volunteer?.roles || [memberRole])
+      .concat(member.roles.cache.map((r) => r.id).filter((r) => r !== gulagRole))
+      .filter((r) => r);
+    if (roles.filter((r) => r).length) {
+      await member.roles.set(roles, 'ungulag');
     }
-    await member.roles.remove(gulagRole, 'ungulag');
 
     // remove from db if not new member
     if (volunteer) {
