@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+- optimize gulag command
+- add ding leaderboard
+
 ## 1.2.0
 - switch from cjs to esm
 - update dependencies
