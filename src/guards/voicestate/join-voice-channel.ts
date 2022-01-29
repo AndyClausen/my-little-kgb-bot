@@ -20,10 +20,6 @@ export function JoinVoiceChannel(
     }
     if (channel instanceof CategoryChannel && channel.children.has(after.channelId)) {
       if (!before || !channel.children.has(before.channelId)) {
-        console.log(channel.type);
-        console.log(channel.id);
-        console.log(channel instanceof CategoryChannel);
-        console.log(after.channel?.parent?.name);
         await next();
       }
     } else if (after.channelId === channelId) {

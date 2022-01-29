@@ -19,10 +19,6 @@ export function LeaveVoiceChannel(
     }
     if (channel instanceof CategoryChannel && channel.children.has(before.channelId)) {
       if (!after || !channel.children.has(after.channelId)) {
-        console.log(channel.type);
-        console.log(channel.id);
-        console.log(channel instanceof CategoryChannel);
-        console.log(before.channel?.parent?.name);
         await next();
       }
     } else if (before.channelId === channelId) {
