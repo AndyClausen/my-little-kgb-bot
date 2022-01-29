@@ -2,10 +2,10 @@ import { Client, Discord, Guard, SlashOption, Slash } from 'discordx';
 import {
   CommandInteraction,
   DiscordAPIError,
-  GuildChannel,
   GuildMember,
+  StageChannel,
   User,
-  VoiceChannelResolvable,
+  VoiceChannel,
 } from 'discord.js';
 
 import { IsAdmin } from '../guards/commands/is-admin';
@@ -25,14 +25,16 @@ export default abstract class Moderation {
     @SlashOption('to', {
       type: 'CHANNEL',
       description: 'Channel to move to',
+      channelTypes: ['GUILD_VOICE', 'GUILD_STAGE_VOICE'],
     })
-    channelTo: GuildChannel,
+    channelTo: VoiceChannel | StageChannel,
     @SlashOption('from', {
       type: 'CHANNEL',
       description: 'Channel to move from',
+      channelTypes: ['GUILD_VOICE', 'GUILD_STAGE_VOICE'],
       required: false,
     })
-    channelFrom: GuildChannel,
+    channelFrom: VoiceChannel | StageChannel,
     interaction: CommandInteraction
   ): Promise<void> {
     if (!(interaction.member instanceof GuildMember)) {
@@ -48,14 +50,6 @@ export default abstract class Moderation {
       }
     }
 
-    if (!(channelFrom.isVoice() && channelTo.isVoice())) {
-      await interaction.reply({
-        content: `The channels _must_ be voice or stage channels!`,
-        ephemeral: true,
-      });
-      return;
-    }
-
     const channelSize = channelFrom.members.size;
     try {
       channelFrom.members.mapValues((member) => {
@@ -67,7 +61,7 @@ export default abstract class Moderation {
       });
       await Promise.all(
         channelFrom.members.mapValues((member) => {
-          return member.voice.setChannel(channelTo as VoiceChannelResolvable);
+          return member.voice.setChannel(channelTo);
         })
       );
     } catch (e) {
@@ -97,7 +91,7 @@ export default abstract class Moderation {
       type: 'USER',
       description: 'User to gulag',
     })
-    user: User | GuildMember,
+    user: User,
     interaction: CommandInteraction,
     client: Client,
     { server }: GuardCache
@@ -176,7 +170,7 @@ export default abstract class Moderation {
       type: 'USER',
       description: 'User to gulag',
     })
-    user: User | GuildMember,
+    user: User,
     interaction: CommandInteraction,
     client: Client,
     { server }: GuardCache
@@ -232,7 +226,9 @@ export default abstract class Moderation {
   @Slash('purge', { description: 'Purge a bunch of messages that are totally not poggers' })
   async purge(
     @SlashOption('amount', {
+      type: 'NUMBER',
       description: 'Amount of messages to delete',
+      minValue: 1,
     })
     amount: number,
     interaction: CommandInteraction
@@ -245,14 +241,6 @@ export default abstract class Moderation {
         content: `I can't purge messages in a dm, baka!`,
         ephemeral: true,
       });
-      return;
-    }
-    if (typeof amount !== 'number') {
-      await interaction.reply({ content: `Amount must be a number`, ephemeral: true });
-      return;
-    }
-    if (amount <= 0) {
-      await interaction.reply({ content: `Amount must be greater than 0`, ephemeral: true });
       return;
     }
 

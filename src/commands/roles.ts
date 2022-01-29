@@ -1,5 +1,5 @@
 import { Client, Discord, SlashGroup, Guard, SlashOption, Slash } from 'discordx';
-import { CommandInteraction, Role } from 'discord.js';
+import { CategoryChannel, CommandInteraction, Role, StageChannel, VoiceChannel } from 'discord.js';
 
 import { ReactionRole } from '../db/models/reaction-role';
 import ServerExists from '../guards/config/server-exists';
@@ -108,40 +108,24 @@ export default abstract class Roles {
   @Guard(ServerExists)
   async addVoiceChatRole(
     @SlashOption('role', { type: 'ROLE' })
-    roleId: string,
-    @SlashOption('channel', { type: 'ROLE' })
-    channelId: string,
+    role: Role,
+    @SlashOption('channel', {
+      type: 'CHANNEL',
+      channelTypes: ['GUILD_VOICE', 'GUILD_STAGE_VOICE', 'GUILD_CATEGORY'],
+    })
+    channel: VoiceChannel | StageChannel | CategoryChannel,
     command: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
-    if (!command.guild.roles.cache.has(roleId)) {
-      await command.reply({ content: `Could not find role with id '${roleId}'`, ephemeral: true });
-      return;
-    }
-    if (!command.guild.channels.cache.has(channelId)) {
-      await command.reply({
-        content: `Could not find channel with id '${channelId}'`,
-        ephemeral: true,
-      });
-      return;
-    }
-    const channelType = command.guild.channels.cache.get(channelId).type;
-    if (!['voice', 'category'].includes(channelType)) {
-      await command.reply({
-        content: `Channel is of type '${channelType}' - it must be either voice or category`,
-        ephemeral: true,
-      });
-      return;
-    }
-    if (server.voiceChatRoles.find((r) => r.roleId === roleId && r.channelId === channelId)) {
+    if (server.voiceChatRoles.find((r) => r.roleId === role.id && r.channelId === channel.id)) {
       await command.reply({ content: 'That voice chat role already exists!', ephemeral: true });
       return;
     }
 
     server.voiceChatRoles.push({
-      roleId,
-      channelId,
+      roleId: role.id,
+      channelId: channel.id,
     });
     await server.save();
     await command.reply('Voice chat role has been added');
@@ -152,26 +136,18 @@ export default abstract class Roles {
   @Guard(ServerExists)
   async removeVoiceChatRole(
     @SlashOption('role', { type: 'ROLE' })
-    roleId: string,
-    @SlashOption('channel', { type: 'CHANNEL' })
-    channelId: string,
+    role: Role,
+    @SlashOption('channel', {
+      type: 'CHANNEL',
+      channelTypes: ['GUILD_VOICE', 'GUILD_STAGE_VOICE', 'GUILD_CATEGORY'],
+    })
+    channel: VoiceChannel | StageChannel | CategoryChannel,
     command: CommandInteraction,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
-    if (!command.guild.roles.cache.has(roleId)) {
-      await command.reply({ content: `Could not find role with id '${roleId}'`, ephemeral: true });
-      return;
-    }
-    if (!command.guild.channels.cache.has(channelId)) {
-      await command.reply({
-        content: `Could not find channel with id '${channelId}'`,
-        ephemeral: true,
-      });
-      return;
-    }
     const voiceChatRole = server.voiceChatRoles.find(
-      (r) => r.roleId === roleId && r.channelId === channelId
+      (r) => r.roleId === role.id && r.channelId === channel.id
     );
     if (!voiceChatRole) {
       await command.reply({ content: 'Could not find that voicechat role...', ephemeral: true });

@@ -13,7 +13,7 @@ export default class Fun {
   })
   async ding(
     @SlashOption('user', { type: 'USER' })
-    user: User | GuildMember,
+    user: User,
     interaction: CommandInteraction
   ): Promise<void> {
     const member = await interaction.guild.members.fetch(user);
@@ -32,7 +32,7 @@ export default class Fun {
   @Slash('unding', { description: 'When you ding someone by mistake' })
   async unding(
     @SlashOption('user', { type: 'USER' })
-    user: User | GuildMember,
+    user: User,
     interaction: CommandInteraction
   ): Promise<void> {
     const member = await interaction.guild.members.fetch(user);

@@ -1,5 +1,5 @@
 import { ArgsOf, Discord, Guard, On, SlashOption, Slash } from 'discordx';
-import { CommandInteraction, GuildMember, Message, User } from 'discord.js';
+import { CommandInteraction, Message, User } from 'discord.js';
 
 import { IsDMChannel } from './guards/messages/is-dm-channel';
 import { FromUser } from './guards/messages/from-user';
@@ -26,7 +26,7 @@ export class Bot {
   @Guard(FromUser(process.env.OWNER_ID))
   async respondToUser(
     @SlashOption('user', { type: 'USER' })
-    user: User | GuildMember,
+    user: User,
     @SlashOption('message', { type: 'STRING' })
     message: string,
     interaction: CommandInteraction
