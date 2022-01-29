@@ -30,9 +30,6 @@ export class Config {
   @prop({ default: false, required: true })
   russianRoulette!: boolean;
 
-  @prop({ default: false, required: true })
-  reactionRoles!: boolean;
-
   static isValidKey(key: string): key is keyof Config {
     return key && key in ConfigModel.schema.paths;
   }
@@ -54,11 +51,7 @@ export class Config {
   }
 
   static isBooleanProp(this: void, key: keyof Config): key is PropsOfType<Config, boolean> {
-    const props: Array<PropsOfType<Config, boolean> | string> = [
-      'randomSus',
-      'russianRoulette',
-      'reactionRoles',
-    ];
+    const props: Array<PropsOfType<Config, boolean> | string> = ['randomSus', 'russianRoulette'];
     return props.includes(key);
   }
 }

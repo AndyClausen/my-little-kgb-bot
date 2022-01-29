@@ -1,12 +1,11 @@
 import { ArgsOf, Client, Discord, Guard, On } from 'discordx';
 
 import ServerExists from '../guards/config/server-exists';
-import IsConfigEnabled from '../guards/config/is-config-enabled';
 import IsReactionRoleMessage from '../guards/reactions/is-reaction-role-message';
 import GuardCache from '../types/GuardCache';
 
 @Discord()
-@Guard(ServerExists, IsConfigEnabled('reactionRoles'), IsReactionRoleMessage)
+@Guard(ServerExists, IsReactionRoleMessage)
 export default abstract class ReactionRoles {
   @On('messageReactionAdd')
   async addRoleToUser(

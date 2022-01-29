@@ -3,12 +3,11 @@ import { CategoryChannel, CommandInteraction, Role, StageChannel, VoiceChannel }
 
 import { ReactionRole } from '../db/models/reaction-role';
 import ServerExists from '../guards/config/server-exists';
-import IsConfigEnabled from '../guards/config/is-config-enabled';
 import GuardCache from '../types/GuardCache';
 import upsertReactionMessage from '../helpers/upsert-reaction-message';
 
 @Discord()
-@Guard(ServerExists, IsConfigEnabled('reactionRoles'))
+@Guard(ServerExists)
 @SlashGroup('roles', 'Like normal roles, but, like, automated', {
   reaction: 'React to a message to get a role! How neat is that?',
   voicechat: 'Roles that are given to users when they join a specific voice channel',
@@ -54,11 +53,7 @@ export default abstract class Roles {
     await server.save();
     await upsertReactionMessage(client, server);
 
-    await interaction.reply(
-      server.config.reactionRoles
-        ? 'Role added!'
-        : 'Role was added, but reaction roles are turned off'
-    );
+    await interaction.reply('Role added!');
   }
 
   @Slash('remove')
@@ -83,11 +78,7 @@ export default abstract class Roles {
     await server.save();
     await upsertReactionMessage(client, server);
 
-    await interaction.reply(
-      server.config.reactionRoles
-        ? 'Role removed!'
-        : 'Role was removed, but reaction roles are turned off'
-    );
+    await interaction.reply('Role removed!');
   }
 
   @Slash('list')
