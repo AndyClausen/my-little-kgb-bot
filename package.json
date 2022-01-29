@@ -1,6 +1,6 @@
 {
   "name": "my-little-kgb-bot",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "scripts": {
     "start": "node --experimental-specifier-resolution=node dist/index.js",
     "start-ts": "node --loader=ts-node/esm --experimental-specifier-resolution=node src/index.ts",

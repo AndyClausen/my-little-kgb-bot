@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.2
+ - fix types for command arguments
+ - add gulag leaderboard
+
 ## 1.2.1
 - optimize gulag command
 - add ding leaderboard
