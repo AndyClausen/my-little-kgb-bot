@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.3
+ - add context menu items for gulag (right-click -> apps -> gulag)
+
 ## 1.2.2
  - fix types for command arguments
  - add gulag leaderboard

@@ -1,19 +1,33 @@
-import { ArgsOf, GuardFunction } from 'discordx';
+import { ArgsOf, GuardFunction, SimpleCommandMessage } from 'discordx';
+import {
+  BaseCommandInteraction,
+  ButtonInteraction,
+  CommandInteraction,
+  ContextMenuInteraction,
+  Message,
+  SelectMenuInteraction,
+  VoiceState,
+} from 'discord.js';
 
 import ServerModel from '../../db/models/server';
 import GuardCache from '../../types/GuardCache';
-import { CommandInteraction, Message, VoiceState } from 'discord.js';
 
 const ServerExists: GuardFunction<
-  | ArgsOf<'message' | 'voiceStateUpdate' | 'messageReactionAdd' | 'messageReactionRemove'>
-  | CommandInteraction,
+  | ArgsOf<'messageCreate' | 'voiceStateUpdate' | 'messageReactionAdd' | 'messageReactionRemove'>
+  | CommandInteraction
+  | ContextMenuInteraction
+  | SelectMenuInteraction
+  | ButtonInteraction
+  | SimpleCommandMessage,
   GuardCache
 > = async (arg, client, next, nextObj) => {
-  const messageOrInteraction = arg instanceof CommandInteraction ? arg : arg[0];
+  const messageOrInteraction = arg instanceof Array ? arg[0] : arg;
   const guild =
+    messageOrInteraction instanceof BaseCommandInteraction ||
     messageOrInteraction instanceof Message ||
-    messageOrInteraction instanceof CommandInteraction ||
-    messageOrInteraction instanceof VoiceState
+    messageOrInteraction instanceof VoiceState ||
+    messageOrInteraction instanceof ButtonInteraction ||
+    messageOrInteraction instanceof SelectMenuInteraction
       ? messageOrInteraction.guild
       : messageOrInteraction.message.guild;
   if (!guild) {

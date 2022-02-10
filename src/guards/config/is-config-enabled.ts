@@ -7,7 +7,7 @@ import { CommandInteraction } from 'discord.js';
 
 export default function IsConfigEnabled(
   key: PropsOfType<Config, boolean>
-): GuardFunction<CommandInteraction | unknown[], GuardCache> {
+): GuardFunction<CommandInteraction | unknown, GuardCache> {
   return async (interaction, client, next, { server }) => {
     if (!server.config[key]) {
       if (interaction instanceof CommandInteraction) {
