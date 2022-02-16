@@ -8,13 +8,23 @@ import upsertReactionMessage from '../helpers/upsert-reaction-message';
 
 @Discord()
 @Guard(ServerExists)
-@SlashGroup('roles', 'Like normal roles, but, like, automated', {
-  reaction: 'React to a message to get a role! How neat is that?',
-  voicechat: 'Roles that are given to users when they join a specific voice channel',
+@SlashGroup({
+  name: 'roles',
+  description: 'Like normal roles, but, like, automated',
 })
-export default abstract class Roles {
+@SlashGroup({
+  name: 'reaction',
+  description: 'React to a message to get a role! How neat is that?',
+  root: 'roles',
+})
+@SlashGroup({
+  name: 'voicechat',
+  description: 'Roles that are given to users when they join a specific voice channel',
+  root: 'roles',
+})
+@SlashGroup('reaction', 'roles')
+export abstract class ReactionRoles {
   @Slash('register', { description: 'Register a channel to post the reaction roles message' })
-  @SlashGroup('reaction')
   async register(
     interaction: CommandInteraction,
     client: Client,
@@ -27,7 +37,6 @@ export default abstract class Roles {
   }
 
   @Slash('add')
-  @SlashGroup('reaction')
   async add(
     @SlashOption('role', { type: 'ROLE', description: 'Role to add' })
     role: Role,
@@ -57,7 +66,6 @@ export default abstract class Roles {
   }
 
   @Slash('remove')
-  @SlashGroup('reaction')
   async remove(
     @SlashOption('role', { type: 'ROLE', description: 'Role to remove' })
     role: Role,
@@ -82,7 +90,6 @@ export default abstract class Roles {
   }
 
   @Slash('list')
-  @SlashGroup('reaction')
   async list(
     interaction: CommandInteraction,
     client: Client,
@@ -93,9 +100,13 @@ export default abstract class Roles {
     msg += '```';
     await interaction.reply({ content: msg, ephemeral: true });
   }
+}
 
+@Discord()
+@Guard(ServerExists)
+@SlashGroup('voicechat', 'roles')
+export abstract class VoiceChatRoles {
   @Slash('add')
-  @SlashGroup('voicechat')
   @Guard(ServerExists)
   async addVoiceChatRole(
     @SlashOption('role', { type: 'ROLE' })
@@ -123,7 +134,6 @@ export default abstract class Roles {
   }
 
   @Slash('remove')
-  @SlashGroup('voicechat')
   @Guard(ServerExists)
   async removeVoiceChatRole(
     @SlashOption('role', { type: 'ROLE' })
@@ -151,7 +161,6 @@ export default abstract class Roles {
   }
 
   @Slash('list')
-  @SlashGroup('voicechat')
   @Guard(ServerExists)
   async listVoiceChatRole(
     command: CommandInteraction,

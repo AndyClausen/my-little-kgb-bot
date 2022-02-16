@@ -20,6 +20,7 @@ import { IsAdmin } from '../guards/commands/is-admin';
 
 @Discord()
 @Guard(ServerExists, IsAdmin)
+@SlashGroup({ name: 'config' })
 @SlashGroup('config')
 export default class Config {
   private readonly validBooleans: ReadonlyArray<string | number> = ['true', 'false', 1, 0];

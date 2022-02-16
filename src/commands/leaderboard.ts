@@ -11,6 +11,7 @@ import CitizenModel from '../db/models/citizen';
 type LeaderboardType = 'dings' | 'gulags';
 
 @Discord()
+@SlashGroup({ name: 'leaderboard' })
 @SlashGroup('leaderboard')
 export default class Leaderboard {
   limit = 10;
