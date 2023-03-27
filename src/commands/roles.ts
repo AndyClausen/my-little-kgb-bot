@@ -1,5 +1,5 @@
 import { Client, Discord, SlashGroup, Guard, SlashOption, Slash } from 'discordx';
-import { CategoryChannel, CommandInteraction, Role, StageChannel, VoiceChannel } from 'discord.js';
+import { CommandInteraction, Role } from 'discord.js';
 
 import { ReactionRole } from '../db/models/reaction-role';
 import ServerExists from '../guards/config/server-exists';
@@ -8,9 +8,11 @@ import upsertReactionMessage from '../helpers/upsert-reaction-message';
 
 @Discord()
 @Guard(ServerExists)
-@SlashGroup('roles', 'Like normal roles, but, like, automated', {
-  reaction: 'React to a message to get a role! How neat is that?',
-  voicechat: 'Roles that are given to users when they join a specific voice channel',
+@SlashGroup({ name: 'roles', description: 'Like normal roles, but, like, automated' })
+@SlashGroup({
+  name: 'reaction',
+  description: 'React to a message to get a role! How neat is that?',
+  root: 'roles',
 })
 export default abstract class Roles {
   @Slash('register', { description: 'Register a channel to post the reaction roles message' })
@@ -92,75 +94,5 @@ export default abstract class Roles {
     server.reactionRoles.forEach((role) => (msg += `${role._id} | ${role.name} | ${role.emoji}\n`));
     msg += '```';
     await interaction.reply({ content: msg, ephemeral: true });
-  }
-
-  @Slash('add')
-  @SlashGroup('voicechat')
-  @Guard(ServerExists)
-  async addVoiceChatRole(
-    @SlashOption('role', { type: 'ROLE' })
-    role: Role,
-    @SlashOption('channel', {
-      type: 'CHANNEL',
-      channelTypes: ['GUILD_VOICE', 'GUILD_STAGE_VOICE', 'GUILD_CATEGORY'],
-    })
-    channel: VoiceChannel | StageChannel | CategoryChannel,
-    command: CommandInteraction,
-    client: Client,
-    { server }: GuardCache
-  ): Promise<void> {
-    if (server.voiceChatRoles.find((r) => r.roleId === role.id && r.channelId === channel.id)) {
-      await command.reply({ content: 'That voice chat role already exists!', ephemeral: true });
-      return;
-    }
-
-    server.voiceChatRoles.push({
-      roleId: role.id,
-      channelId: channel.id,
-    });
-    await server.save();
-    await command.reply('Voice chat role has been added');
-  }
-
-  @Slash('remove')
-  @SlashGroup('voicechat')
-  @Guard(ServerExists)
-  async removeVoiceChatRole(
-    @SlashOption('role', { type: 'ROLE' })
-    role: Role,
-    @SlashOption('channel', {
-      type: 'CHANNEL',
-      channelTypes: ['GUILD_VOICE', 'GUILD_STAGE_VOICE', 'GUILD_CATEGORY'],
-    })
-    channel: VoiceChannel | StageChannel | CategoryChannel,
-    command: CommandInteraction,
-    client: Client,
-    { server }: GuardCache
-  ): Promise<void> {
-    const voiceChatRole = server.voiceChatRoles.find(
-      (r) => r.roleId === role.id && r.channelId === channel.id
-    );
-    if (!voiceChatRole) {
-      await command.reply({ content: 'Could not find that voicechat role...', ephemeral: true });
-      return;
-    }
-
-    server.voiceChatRoles.remove(voiceChatRole);
-    await server.save();
-    await command.reply('Voice chat role has been removed');
-  }
-
-  @Slash('list')
-  @SlashGroup('voicechat')
-  @Guard(ServerExists)
-  async listVoiceChatRole(
-    command: CommandInteraction,
-    client: Client,
-    { server }: GuardCache
-  ): Promise<void> {
-    let msg = '```\n';
-    server.voiceChatRoles.forEach((r) => (msg += `Role: ${r.roleId}, Channel: ${r.channelId}\n`));
-    msg += '```';
-    await command.reply({ content: msg, ephemeral: true });
   }
 }

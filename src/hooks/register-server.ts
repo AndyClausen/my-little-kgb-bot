@@ -5,7 +5,7 @@ import sendSystemMessage from '../helpers/send-system-message';
 
 @Discord()
 export default class RegisterServer {
-  @On('guildCreate')
+  @On({ event: 'guildCreate' })
   async botJoinServer([guild]: ArgsOf<'guildCreate'>): Promise<void> {
     try {
       const server = await ServerModel.create({
@@ -17,7 +17,6 @@ export default class RegisterServer {
         },
         gulag: [],
         reactionRoles: [],
-        voiceChatRoles: [],
       } as Server);
       await sendSystemMessage(
         guild,

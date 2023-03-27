@@ -7,7 +7,6 @@ import Mongoose from 'mongoose';
 import { Volunteer } from './volunteer';
 import { Config } from './config';
 import { ReactionRole } from './reaction-role';
-import { VoiceChatRole } from './voice-chat-role';
 
 export class Server extends TimeStamps {
   @prop({ type: String, required: true })
@@ -27,9 +26,6 @@ export class Server extends TimeStamps {
 
   @prop({ type: String, required: false })
   reactionRolesChannelId?: Snowflake;
-
-  @prop({ type: VoiceChatRole, default: [], required: true })
-  voiceChatRoles!: Mongoose.Types.Array<VoiceChatRole>;
 }
 
 const ServerModel = getModelForClass(Server);
