@@ -1,9 +1,9 @@
 import { ArgsOf, GuardFunction, SimpleCommandMessage } from 'discordx';
 import {
-  BaseCommandInteraction,
   ButtonInteraction,
   CommandInteraction,
-  ContextMenuInteraction,
+  ContextMenuCommandInteraction,
+  Events,
   Message,
   SelectMenuInteraction,
   VoiceState,
@@ -13,9 +13,14 @@ import ServerModel from '../../db/models/server';
 import GuardCache from '../../types/GuardCache';
 
 const ServerExists: GuardFunction<
-  | ArgsOf<'messageCreate' | 'voiceStateUpdate' | 'messageReactionAdd' | 'messageReactionRemove'>
+  | ArgsOf<
+      | Events.MessageCreate
+      | Events.VoiceStateUpdate
+      | Events.MessageReactionAdd
+      | Events.MessageReactionRemove
+    >
   | CommandInteraction
-  | ContextMenuInteraction
+  | ContextMenuCommandInteraction
   | SelectMenuInteraction
   | ButtonInteraction
   | SimpleCommandMessage,
@@ -23,7 +28,7 @@ const ServerExists: GuardFunction<
 > = async (arg, client, next, nextObj) => {
   const messageOrInteraction = arg instanceof Array ? arg[0] : arg;
   const guild =
-    messageOrInteraction instanceof BaseCommandInteraction ||
+    messageOrInteraction instanceof CommandInteraction ||
     messageOrInteraction instanceof Message ||
     messageOrInteraction instanceof VoiceState ||
     messageOrInteraction instanceof ButtonInteraction ||

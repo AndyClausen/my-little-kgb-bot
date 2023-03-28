@@ -30,28 +30,22 @@ export class Config {
   @prop({ default: false, required: true })
   russianRoulette!: boolean;
 
-  static isValidKey(key: string): key is keyof Config {
+  static isValidKey(key: string | number | symbol | null): key is keyof Config {
     return key && key in ConfigModel.schema.paths;
   }
 
   static isStringProp(key: keyof Config): key is PropsOfType<Config, string> {
-    const props: Array<PropsOfType<Config, string> | string> = [
-      'memberRole',
-      'adminRole',
-      'modRole',
-      'gulagRole',
-      'logChannel',
-    ];
+    const props: Array<string> = ['memberRole', 'adminRole', 'modRole', 'gulagRole', 'logChannel'];
     return props.includes(key);
   }
 
   static isNumberProp(key: keyof Config): key is PropsOfType<Config, number> {
-    const props: Array<PropsOfType<Config, number> | string> = ['susChance'];
+    const props: Array<string> = ['susChance'];
     return props.includes(key);
   }
 
   static isBooleanProp(this: void, key: keyof Config): key is PropsOfType<Config, boolean> {
-    const props: Array<PropsOfType<Config, boolean> | string> = ['randomSus', 'russianRoulette'];
+    const props: Array<string> = ['randomSus', 'russianRoulette'];
     return props.includes(key);
   }
 }

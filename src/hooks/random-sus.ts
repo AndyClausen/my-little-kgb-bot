@@ -1,12 +1,12 @@
 import { Discord, Guard, On } from 'discordx';
-import { Message } from 'discord.js';
+import { Events, Message } from 'discord.js';
 
 import IsConfigEnabled from '../guards/config/is-config-enabled';
 import ServerExists from '../guards/config/server-exists';
 
 @Discord()
 export default class RandomSus {
-  @On('messageCreate')
+  @On({ event: Events.MessageCreate })
   @Guard(ServerExists, IsConfigEnabled('randomSus'))
   async randomSus([message]: Message[]): Promise<void> {
     const roll = Math.random();

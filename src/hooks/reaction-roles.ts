@@ -1,4 +1,5 @@
 import { ArgsOf, Client, Discord, Guard, On } from 'discordx';
+import { Events } from 'discord.js';
 
 import ServerExists from '../guards/config/server-exists';
 import IsReactionRoleMessage from '../guards/reactions/is-reaction-role-message';
@@ -7,9 +8,9 @@ import GuardCache from '../types/GuardCache';
 @Discord()
 @Guard(ServerExists, IsReactionRoleMessage)
 export default abstract class ReactionRoles {
-  @On('messageReactionAdd')
+  @On({ event: Events.MessageReactionAdd })
   async addRoleToUser(
-    [messageReaction, user]: ArgsOf<'messageReactionAdd'>,
+    [messageReaction, user]: ArgsOf<Events.MessageReactionAdd>,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
@@ -23,9 +24,9 @@ export default abstract class ReactionRoles {
     await member.roles.add(role._id);
   }
 
-  @On('messageReactionRemove')
+  @On({ event: Events.MessageReactionRemove })
   async removeRoleFromUser(
-    [messageReaction, user]: ArgsOf<'messageReactionRemove'>,
+    [messageReaction, user]: ArgsOf<Events.MessageReactionRemove>,
     client: Client,
     { server }: GuardCache
   ): Promise<void> {

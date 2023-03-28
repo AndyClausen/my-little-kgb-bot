@@ -6,10 +6,10 @@ import {
   Guard,
   SlashOption,
   Slash,
-  SlashChoicesType,
+  SlashChoiceType,
 } from 'discordx';
 import { DocumentType } from '@typegoose/typegoose';
-import { CommandInteraction } from 'discord.js';
+import { ApplicationCommandOptionType, CommandInteraction } from 'discord.js';
 
 import ConfigModel, { Config as ConfigClass } from '../db/models/config';
 import { Server } from '../db/models/server';
@@ -20,11 +20,12 @@ import { IsAdmin } from '../guards/commands/is-admin';
 
 @Discord()
 @Guard(ServerExists, IsAdmin)
+@SlashGroup({ name: 'config', description: 'Configure me however you want, zaddy' })
 @SlashGroup('config')
 export default class Config {
   private readonly validBooleans: ReadonlyArray<string | number> = ['true', 'false', 1, 0];
 
-  @Slash('list')
+  @Slash({ name: 'list', description: 'shows current config' })
   async list(
     interaction: CommandInteraction,
     client: Client,
@@ -38,18 +39,19 @@ export default class Config {
     await interaction.reply({ content: str, ephemeral: true });
   }
 
-  @Slash('enable')
+  @Slash({ name: 'enable', description: 'enable a feature/setting' })
   @Guard(IsValidKey)
   async enable(
     @SlashChoice(
-      Object.keys(ConfigModel.schema.paths)
+      ...Object.keys(ConfigModel.schema.paths)
         .filter(ConfigClass.isBooleanProp)
-        .reduce<SlashChoicesType>((obj, key) => {
-          obj[key] = key;
-          return obj;
-        }, {})
+        .map<SlashChoiceType>((key) => ({ name: key, value: key }))
     )
-    @SlashOption('key', { type: 'STRING' })
+    @SlashOption({
+      name: 'key',
+      type: ApplicationCommandOptionType.String,
+      description: 'key in config',
+    })
     key: keyof ConfigClass,
     interaction: CommandInteraction,
     client: Client,
@@ -58,16 +60,19 @@ export default class Config {
     await this.toggle(key, interaction, client, server, true);
   }
 
-  @Slash('disable')
+  @Slash({ name: 'disable', description: 'disable a feature/setting' })
   @Guard(IsValidKey)
   async disable(
     @SlashChoice(
-      Object.keys(ConfigModel.schema.paths).reduce<SlashChoicesType>((obj, key) => {
-        obj[key] = key;
-        return obj;
-      }, {})
+      ...Object.keys(ConfigModel.schema.paths)
+        .filter(ConfigClass.isBooleanProp)
+        .map<SlashChoiceType>((key) => ({ name: key, value: key }))
     )
-    @SlashOption('key', { type: 'STRING' })
+    @SlashOption({
+      name: 'key',
+      type: ApplicationCommandOptionType.String,
+      description: 'key in config',
+    })
     key: keyof ConfigClass,
     interaction: CommandInteraction,
     client: Client,
@@ -96,18 +101,26 @@ export default class Config {
     });
   }
 
-  @Slash('set')
+  @Slash({ name: 'set', description: 'set a config key to a value' })
   @Guard(IsValidKey)
   async set(
     @SlashChoice(
-      Object.keys(ConfigModel.schema.paths).reduce<SlashChoicesType>((obj, key) => {
-        obj[key] = key;
-        return obj;
-      }, {})
+      ...Object.keys(ConfigModel.schema.paths).map<SlashChoiceType>((key) => ({
+        name: key,
+        value: key,
+      }))
     )
-    @SlashOption('key', { type: 'STRING' })
+    @SlashOption({
+      name: 'key',
+      type: ApplicationCommandOptionType.String,
+      description: 'key in config',
+    })
     key: keyof ConfigClass,
-    @SlashOption('value', { type: 'STRING' })
+    @SlashOption({
+      name: 'value',
+      type: ApplicationCommandOptionType.String,
+      description: 'value to set to',
+    })
     value: string,
     interaction: CommandInteraction,
     client: Client,
@@ -160,16 +173,20 @@ export default class Config {
     });
   }
 
-  @Slash('get')
+  @Slash({ name: 'get', description: 'get the value of a config key' })
   @Guard(IsValidKey)
   async get(
     @SlashChoice(
-      Object.keys(ConfigModel.schema.paths).reduce<SlashChoicesType>((obj, key) => {
-        obj[key] = key;
-        return obj;
-      }, {})
+      ...Object.keys(ConfigModel.schema.paths).map<SlashChoiceType>((key) => ({
+        name: key,
+        value: key,
+      }))
     )
-    @SlashOption('key', { type: 'STRING' })
+    @SlashOption({
+      name: 'key',
+      type: ApplicationCommandOptionType.String,
+      description: 'key in config',
+    })
     key: keyof ConfigClass,
     interaction: CommandInteraction,
     client: Client,

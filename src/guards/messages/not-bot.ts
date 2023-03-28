@@ -2,7 +2,8 @@ import { ArgsOf, GuardFunction, SimpleCommandMessage } from 'discordx';
 import {
   ButtonInteraction,
   CommandInteraction,
-  ContextMenuInteraction,
+  ContextMenuCommandInteraction,
+  Events,
   Message,
   SelectMenuInteraction,
   VoiceState,
@@ -12,9 +13,14 @@ import {
 // Modified @oceanroleplay
 
 export const NotBot: GuardFunction<
-  | ArgsOf<'messageCreate' | 'messageReactionAdd' | 'messageReactionRemove' | 'voiceStateUpdate'>
+  | ArgsOf<
+      | Events.MessageCreate
+      | Events.MessageReactionAdd
+      | Events.MessageReactionRemove
+      | Events.VoiceStateUpdate
+    >
   | CommandInteraction
-  | ContextMenuInteraction
+  | ContextMenuCommandInteraction
   | SelectMenuInteraction
   | ButtonInteraction
   | SimpleCommandMessage
@@ -28,7 +34,7 @@ export const NotBot: GuardFunction<
       : argObj instanceof SimpleCommandMessage
       ? argObj.message?.author
       : argObj instanceof CommandInteraction ||
-        argObj instanceof ContextMenuInteraction ||
+        argObj instanceof ContextMenuCommandInteraction ||
         argObj instanceof SelectMenuInteraction ||
         argObj instanceof ButtonInteraction ||
         argObj instanceof VoiceState

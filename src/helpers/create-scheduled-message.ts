@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import { Client } from 'discordx';
 import moment from 'moment';
 

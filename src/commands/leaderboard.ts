@@ -2,20 +2,24 @@ import { ButtonComponent, Client, Discord, Slash, SlashGroup } from 'discordx';
 import {
   ButtonInteraction,
   CommandInteraction,
-  MessageActionRow,
-  MessageButton,
-  MessageEmbed,
+  ButtonBuilder,
+  ActionRowBuilder,
+  MessageActionRowComponentBuilder,
+  EmbedBuilder,
+  ButtonStyle,
 } from 'discord.js';
 import CitizenModel from '../db/models/citizen';
 
 type LeaderboardType = 'dings' | 'gulags';
 
 @Discord()
+@SlashGroup({ name: 'leaderboard', description: 'Who holds the record of most gulag vacations?' })
 @SlashGroup('leaderboard')
 export default class Leaderboard {
   limit = 10;
 
-  @Slash('dings', {
+  @Slash({
+    name: 'dings',
     description: 'See who has talked with their mic muted the most (cross-server)',
   })
   async leaderboardDings(interaction: CommandInteraction, client: Client): Promise<void> {
@@ -23,7 +27,8 @@ export default class Leaderboard {
     await interaction.reply(options);
   }
 
-  @Slash('gulags', {
+  @Slash({
+    name: 'gulags',
     description: 'See who has been sent to the gulag the most (cross-server)',
   })
   async leaderboardGulag(interaction: CommandInteraction, client: Client): Promise<void> {
@@ -31,7 +36,7 @@ export default class Leaderboard {
     await interaction.reply(options);
   }
 
-  @ButtonComponent('prev-leaderboard-btn')
+  @ButtonComponent({ id: 'prev-leaderboard-btn' })
   async prevLeaderboardBtn(interaction: ButtonInteraction, client: Client): Promise<void> {
     const { title } = interaction.message.embeds[0];
     const type = title.includes('dings') ? 'dings' : 'gulags';
@@ -41,7 +46,7 @@ export default class Leaderboard {
     await interaction.update(options);
   }
 
-  @ButtonComponent('next-leaderboard-btn')
+  @ButtonComponent({ id: 'next-leaderboard-btn' })
   async nextLeaderboardBtn(interaction: ButtonInteraction, client: Client): Promise<void> {
     const { title } = interaction.message.embeds[0];
     const type = title.includes('dings') ? 'dings' : 'gulags';
@@ -58,7 +63,7 @@ export default class Leaderboard {
       .limit(this.limit)
       .skip(skip);
 
-    const embed = new MessageEmbed({
+    const embed = new EmbedBuilder({
       title: `Top ${type} globally`,
       description: `Top ${skip + 1}-${skip + page.length}`,
       fields: await Promise.all(
@@ -71,22 +76,24 @@ export default class Leaderboard {
         }))
       ),
     });
-    const prevBtn = new MessageButton()
+    const prevBtn = new ButtonBuilder()
       .setLabel('Previous')
       .setEmoji('⏮')
-      .setStyle('PRIMARY')
+      .setStyle(ButtonStyle.Primary)
       .setDisabled(!skip)
       .setCustomId('prev-leaderboard-btn');
-    const nextBtn = new MessageButton()
+    const nextBtn = new ButtonBuilder()
       .setLabel('Next')
       .setEmoji('⏭')
-      .setStyle('PRIMARY')
+      .setStyle(ButtonStyle.Primary)
       .setDisabled((await CitizenModel.count({ [key]: { $gt: 0 } })) <= skip + this.limit)
       .setCustomId('next-leaderboard-btn');
 
     return {
       embeds: [embed],
-      components: [new MessageActionRow().setComponents(prevBtn, nextBtn)],
+      components: [
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(prevBtn, nextBtn),
+      ],
     };
   }
 }

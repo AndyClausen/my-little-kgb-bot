@@ -1,7 +1,7 @@
 import { ArgsOf, GuardFunction } from 'discordx';
-import { CommandInteraction } from 'discord.js';
+import { CommandInteraction, Events } from 'discord.js';
 
-export const IsDMChannel: GuardFunction<ArgsOf<'message'> | CommandInteraction> = async (
+export const IsDMChannel: GuardFunction<ArgsOf<Events.MessageCreate> | CommandInteraction> = async (
   arg,
   client,
   next

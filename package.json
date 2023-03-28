@@ -8,7 +8,7 @@
     "start:build": "npm run build && npm run start"
   },
   "main": "dist/index.js",
-  "repository": "https://github.com/AndyClausen/among-bot.git",
+  "repository": "https://github.com/AndyClausen/my-little-kgb-bot.git",
   "author": "Andy <andreas.clausen@hotmail.com>",
   "license": "MIT",
   "engines": {
@@ -16,25 +16,25 @@
   },
   "type": "module",
   "dependencies": {
-    "@discordx/importer": "^1.1.2",
-    "@typegoose/typegoose": "^9.5.0",
-    "discord.js": "^13.6.0",
-    "discordx": "^9.1.12",
-    "dotenv": "^14.3.2",
-    "moment": "^2.29.1",
-    "mongoose": "6.1.8",
-    "reflect-metadata": "^0.1.13",
-    "ts-node": "^10.4.0"
+    "@discordx/importer": "^1.2.1",
+    "@typegoose/typegoose": "10.3.4",
+    "discord.js": "14.8.0",
+    "discordx": "11.7.4",
+    "dotenv": "16.0.3",
+    "moment": "2.29.4",
+    "mongoose": "7.0.3",
+    "reflect-metadata": "0.1.13",
+    "ts-node": "10.9.1"
   },
   "devDependencies": {
-    "@types/node": "^16.11.21",
-    "@typescript-eslint/eslint-plugin": "^5.10.1",
-    "@typescript-eslint/parser": "^5.10.1",
-    "eslint": "^8.8.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.5.1",
-    "tslib": "^2.3.1",
-    "typescript": "^4.5.5"
+    "@types/node": "18.15.10",
+    "@typescript-eslint/eslint-plugin": "5.56.0",
+    "@typescript-eslint/parser": "5.56.0",
+    "eslint": "8.36.0",
+    "eslint-config-prettier": "8.8.0",
+    "eslint-plugin-prettier": "4.2.1",
+    "prettier": "2.8.7",
+    "tslib": "2.5.0",
+    "typescript": "4.9.5"
   }
 }

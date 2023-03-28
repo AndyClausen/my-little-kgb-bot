@@ -1,7 +1,7 @@
-import { BaseCommandInteraction, User } from 'discord.js';
+import { CommandInteraction, User } from 'discord.js';
 import { getOrCreateCitizen } from '../db/get-or-create-citizen';
 
-export async function ding(user: User, interaction: BaseCommandInteraction): Promise<void> {
+export async function ding(user: User, interaction: CommandInteraction): Promise<void> {
   const member = await interaction.guild.members.fetch(user);
   if (!member) {
     await interaction.reply(`Could not find that member`);
@@ -15,7 +15,7 @@ export async function ding(user: User, interaction: BaseCommandInteraction): Pro
   );
 }
 
-export async function unding(user: User, interaction: BaseCommandInteraction): Promise<void> {
+export async function unding(user: User, interaction: CommandInteraction): Promise<void> {
   const member = await interaction.guild.members.fetch(user);
   if (!member) {
     await interaction.reply(`Could not find that member`);

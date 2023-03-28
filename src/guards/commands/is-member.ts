@@ -1,14 +1,12 @@
 import { ArgsOf, GuardFunction } from 'discordx';
 
 import GuardCache from '../../types/GuardCache';
-import { CommandInteraction, GuildMember } from 'discord.js';
+import { CommandInteraction, Events, GuildMember } from 'discord.js';
 
-const IsMember: GuardFunction<ArgsOf<'message'> | CommandInteraction, GuardCache> = async (
-  arg,
-  client,
-  next,
-  { server }
-) => {
+const IsMember: GuardFunction<
+  ArgsOf<Events.MessageCreate> | CommandInteraction,
+  GuardCache
+> = async (arg, client, next, { server }) => {
   const messageOrInteraction = arg instanceof CommandInteraction ? arg : arg[0];
   if (!(messageOrInteraction.member instanceof GuildMember)) {
     return;

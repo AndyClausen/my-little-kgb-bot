@@ -1,11 +1,15 @@
 import { Client, ContextMenu, Discord, Guard, SlashOption, Slash } from 'discordx';
 import {
+  ApplicationCommandOptionType,
+  ApplicationCommandType,
+  ChannelType,
   CommandInteraction,
   GuildMember,
-  MessageContextMenuInteraction,
+  MessageContextMenuCommandInteraction,
+  PermissionsBitField,
   StageChannel,
   User,
-  UserContextMenuInteraction,
+  UserContextMenuCommandInteraction,
   VoiceChannel,
 } from 'discord.js';
 
@@ -19,18 +23,20 @@ import { gulag, ungulag } from '../helpers/gulag-helpers';
 @Guard(ServerExists, IsMod)
 export default abstract class Moderation {
   @Guard(IsAdmin)
-  @Slash('move', { description: 'Move all users from one voice channel to another' })
+  @Slash({ name: 'move', description: 'Move all users from one voice channel to another' })
   async bulkMove(
-    @SlashOption('to', {
-      type: 'CHANNEL',
+    @SlashOption({
+      name: 'to',
+      type: ApplicationCommandOptionType.Channel,
       description: 'Channel to move to',
-      channelTypes: ['GUILD_VOICE', 'GUILD_STAGE_VOICE'],
+      channelTypes: [ChannelType.GuildVoice, ChannelType.GuildStageVoice],
     })
     channelTo: VoiceChannel | StageChannel,
-    @SlashOption('from', {
-      type: 'CHANNEL',
+    @SlashOption({
+      name: 'from',
+      type: ApplicationCommandOptionType.Channel,
       description: 'Channel to move from',
-      channelTypes: ['GUILD_VOICE', 'GUILD_STAGE_VOICE'],
+      channelTypes: [ChannelType.GuildVoice, ChannelType.GuildStageVoice],
       required: false,
     })
     channelFrom: VoiceChannel | StageChannel,
@@ -52,7 +58,7 @@ export default abstract class Moderation {
     const channelSize = channelFrom.members.size;
     try {
       channelFrom.members.mapValues((member) => {
-        if (channelTo.permissionsFor(member).missing('CONNECT').length) {
+        if (channelTo.permissionsFor(member).missing(PermissionsBitField.Flags.Connect).length) {
           const err = new Error(member.id);
           err.name = 'missingConnectPerm';
           throw err;
@@ -83,36 +89,36 @@ export default abstract class Moderation {
     });
   }
 
-  @ContextMenu('MESSAGE', 'gulag author')
+  @ContextMenu({ name: 'gulag author', type: ApplicationCommandType.Message })
   async gulagAuthor(
-    interaction: MessageContextMenuInteraction,
+    interaction: MessageContextMenuCommandInteraction,
     client: Client,
     { server }: GuardCache
   ) {
     await gulag(interaction.targetMessage.author.id, server, interaction);
   }
 
-  @ContextMenu('MESSAGE', 'ungulag author')
+  @ContextMenu({ name: 'ungulag author', type: ApplicationCommandType.Message })
   async ungulagAuthor(
-    interaction: MessageContextMenuInteraction,
+    interaction: MessageContextMenuCommandInteraction,
     client: Client,
     { server }: GuardCache
   ) {
     await ungulag(interaction.targetMessage.author.id, server, interaction);
   }
 
-  @ContextMenu('USER', 'gulag')
+  @ContextMenu({ name: 'gulag', type: ApplicationCommandType.User })
   async gulagContext(
-    interaction: UserContextMenuInteraction,
+    interaction: UserContextMenuCommandInteraction,
     client: Client,
     { server }: GuardCache
   ) {
     await gulag(interaction.targetUser, server, interaction);
   }
 
-  @ContextMenu('USER', 'ungulag')
+  @ContextMenu({ name: 'ungulag', type: ApplicationCommandType.User })
   async ungulagContext(
-    interaction: UserContextMenuInteraction,
+    interaction: UserContextMenuCommandInteraction,
     client: Client,
     { server }: GuardCache
   ) {
@@ -120,10 +126,14 @@ export default abstract class Moderation {
   }
 
   @Guard(IsAdmin)
-  @Slash('gulag')
+  @Slash({
+    name: 'gulag',
+    description: 'Strip a traitor of their status and send them to the gulag',
+  })
   async gulagCommand(
-    @SlashOption('user', {
-      type: 'USER',
+    @SlashOption({
+      name: 'user',
+      type: ApplicationCommandOptionType.User,
       description: 'User to gulag',
     })
     user: User,
@@ -134,10 +144,11 @@ export default abstract class Moderation {
     await gulag(user, server, interaction);
   }
 
-  @Slash('ungulag')
+  @Slash({ name: 'ungulag', description: 'Fetch a comrade from the gulag and return their status' })
   async ungulag(
-    @SlashOption('user', {
-      type: 'USER',
+    @SlashOption({
+      name: 'user',
+      type: ApplicationCommandOptionType.User,
       description: 'User to gulag',
     })
     user: User,
@@ -149,20 +160,21 @@ export default abstract class Moderation {
   }
 
   @Guard(IsAdmin)
-  @Slash('purge', { description: 'Purge a bunch of messages that are totally not poggers' })
+  @Slash({ name: 'purge', description: 'Purge a bunch of messages that are totally not poggers' })
   async purge(
-    @SlashOption('amount', {
-      type: 'NUMBER',
+    @SlashOption({
+      name: 'amount',
+      type: ApplicationCommandOptionType.Number,
       description: 'Amount of messages to delete',
       minValue: 1,
     })
     amount: number,
     interaction: CommandInteraction
   ): Promise<void> {
-    if (!interaction.channel.isText()) {
+    if (!interaction.channel.isTextBased()) {
       return;
     }
-    if (interaction.channel.type === 'DM') {
+    if (interaction.channel.isDMBased()) {
       await interaction.reply({
         content: `I can't purge messages in a dm, baka!`,
         ephemeral: true,

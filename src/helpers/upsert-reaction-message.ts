@@ -1,4 +1,4 @@
-import { EmbedFieldData, Message, MessageEmbed, TextChannel } from 'discord.js';
+import { EmbedField, Message, EmbedBuilder, TextChannel } from 'discord.js';
 import { Client } from 'discordx';
 import { DocumentType } from '@typegoose/typegoose';
 
@@ -19,12 +19,13 @@ export default async function upsertReactionMessage(
     return;
   }
 
-  const roleEmbed = new MessageEmbed({
+  const roleEmbed = new EmbedBuilder({
     title: 'Role Assignment',
     description: 'React to this to receive a role!',
-    fields: reactionRoles.map<EmbedFieldData>((role) => ({
+    fields: reactionRoles.map<EmbedField>((role) => ({
       name: role.emoji,
       value: role.name,
+      inline: false,
     })),
   });
 

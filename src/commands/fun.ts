@@ -1,5 +1,12 @@
 import { Client, Discord, Guard, SlashOption, Slash, ContextMenu } from 'discordx';
-import { CommandInteraction, GuildMember, User, UserContextMenuInteraction } from 'discord.js';
+import {
+  ApplicationCommandType,
+  ApplicationCommandOptionType,
+  CommandInteraction,
+  GuildMember,
+  User,
+  UserContextMenuCommandInteraction,
+} from 'discord.js';
 
 import IsConfigEnabled from '../guards/config/is-config-enabled';
 import ServerExists from '../guards/config/server-exists';
@@ -9,37 +16,46 @@ import { gulag, ungulag } from '../helpers/gulag-helpers';
 
 @Discord()
 export default class Fun {
-  @ContextMenu('USER', 'ding')
-  async dingUser(interaction: UserContextMenuInteraction) {
+  @ContextMenu({ name: 'ding', type: ApplicationCommandType.User })
+  async dingUser(interaction: UserContextMenuCommandInteraction) {
     await ding(interaction.targetUser, interaction);
   }
 
-  @ContextMenu('USER', 'unding')
-  async undingUser(interaction: UserContextMenuInteraction) {
+  @ContextMenu({ name: 'unding', type: ApplicationCommandType.User })
+  async undingUser(interaction: UserContextMenuCommandInteraction) {
     await unding(interaction.targetUser, interaction);
   }
 
-  @Slash('ding', {
+  @Slash({
+    name: 'ding',
     description: 'Make a game out of shaming someone for talking with their mic muted',
   })
   async dingCommand(
-    @SlashOption('user', { type: 'USER' })
+    @SlashOption({
+      name: 'user',
+      type: ApplicationCommandOptionType.User,
+      description: 'user to ding',
+    })
     user: User,
     interaction: CommandInteraction
   ): Promise<void> {
     await ding(user, interaction);
   }
 
-  @Slash('unding', { description: 'When you ding someone by mistake' })
+  @Slash({ name: 'unding', description: 'When you ding someone by mistake' })
   async undingCommand(
-    @SlashOption('user', { type: 'USER' })
+    @SlashOption({
+      name: 'user',
+      type: ApplicationCommandOptionType.User,
+      description: 'user to unding',
+    })
     user: User,
     interaction: CommandInteraction
   ): Promise<void> {
     await unding(user, interaction);
   }
 
-  @Slash('rr', { description: `Do it, you won't, no balls` })
+  @Slash({ name: 'rr', description: `Do it, you won't, no balls` })
   @Guard(ServerExists, IsConfigEnabled('russianRoulette'))
   async russianRoulette(
     interaction: CommandInteraction,

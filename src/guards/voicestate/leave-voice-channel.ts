@@ -1,10 +1,10 @@
 import { ArgsOf, GuardFunction } from 'discordx';
-import { CategoryChannel, VoiceState } from 'discord.js';
+import { CategoryChannel, Events, VoiceState } from 'discord.js';
 import GuardCache from '../../types/GuardCache';
 
 export function LeaveVoiceChannel(
   idOrFunc: string | ((voiceState: VoiceState, cache: GuardCache) => string)
-): GuardFunction<ArgsOf<'voiceStateUpdate'>, GuardCache> {
+): GuardFunction<ArgsOf<Events.VoiceStateUpdate>, GuardCache> {
   return async ([before, after], client, next, cache) => {
     if (!before) {
       return;
@@ -17,8 +17,8 @@ export function LeaveVoiceChannel(
     if (!channel) {
       return;
     }
-    if (channel instanceof CategoryChannel && channel.children.has(before.channelId)) {
-      if (!after || !channel.children.has(after.channelId)) {
+    if (channel instanceof CategoryChannel && channel.children.cache.has(before.channelId)) {
+      if (!after || !channel.children.cache.has(after.channelId)) {
         await next();
       }
     } else if (before.channelId === channelId) {

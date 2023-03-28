@@ -8,7 +8,7 @@ export class Volunteer extends TimeStamps {
   _id!: Snowflake;
 
   @prop({ type: () => [String], default: [], required: true })
-  roles!: string[];
+  roles!: Snowflake[];
 }
 
 const VolunteerModel = getModelForClass(Volunteer);

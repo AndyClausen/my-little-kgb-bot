@@ -1,4 +1,4 @@
-import { BaseCommandInteraction, DiscordAPIError, UserResolvable } from 'discord.js';
+import { CommandInteraction, DiscordAPIError, Snowflake, UserResolvable } from 'discord.js';
 import { DocumentType } from '@typegoose/typegoose';
 
 import { Volunteer } from '../db/models/volunteer';
@@ -9,7 +9,7 @@ import { Server } from '../db/models/server';
 export async function gulag(
   user: UserResolvable,
   server: DocumentType<Server>,
-  interaction: BaseCommandInteraction
+  interaction: CommandInteraction
 ) {
   const member = await interaction.guild.members.fetch(user);
   if (!member) {
@@ -31,7 +31,7 @@ export async function gulag(
   }
   const [roles, immutableRoles] = [
     ...member.roles.cache.filter((role) => !role.tags?.premiumSubscriberRole).keys(),
-  ].reduce<[string[], string[]]>(
+  ].reduce<[Snowflake[], Snowflake[]]>(
     ([a, b], roleId) => {
       ([interaction.guild.id, adminRole].includes(roleId) ? b : a).push(roleId);
       return [a, b];
@@ -81,7 +81,7 @@ export async function gulag(
 export async function ungulag(
   user: UserResolvable,
   server: DocumentType<Server>,
-  interaction: BaseCommandInteraction
+  interaction: CommandInteraction
 ) {
   const member = await interaction.guild.members.fetch(user);
   if (!member) {

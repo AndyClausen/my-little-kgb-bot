@@ -1,5 +1,5 @@
 import { Client, Discord, SlashGroup, Guard, SlashOption, Slash } from 'discordx';
-import { CommandInteraction, Role } from 'discord.js';
+import { ApplicationCommandOptionType, CommandInteraction, Role } from 'discord.js';
 
 import { ReactionRole } from '../db/models/reaction-role';
 import ServerExists from '../guards/config/server-exists';
@@ -8,15 +8,13 @@ import upsertReactionMessage from '../helpers/upsert-reaction-message';
 
 @Discord()
 @Guard(ServerExists)
-@SlashGroup({ name: 'roles', description: 'Like normal roles, but, like, automated' })
 @SlashGroup({
-  name: 'reaction',
+  name: 'reaction-roles',
   description: 'React to a message to get a role! How neat is that?',
-  root: 'roles',
 })
+@SlashGroup('reaction-roles')
 export default abstract class Roles {
-  @Slash('register', { description: 'Register a channel to post the reaction roles message' })
-  @SlashGroup('reaction')
+  @Slash({ name: 'register', description: 'Register a channel to post the reaction roles message' })
   async register(
     interaction: CommandInteraction,
     client: Client,
@@ -28,14 +26,25 @@ export default abstract class Roles {
     await interaction.reply({ content: 'Channel successfully registered!', ephemeral: true });
   }
 
-  @Slash('add')
-  @SlashGroup('reaction')
+  @Slash({ name: 'add', description: 'add a reaction role' })
   async add(
-    @SlashOption('role', { type: 'ROLE', description: 'Role to add' })
+    @SlashOption({
+      name: 'role',
+      type: ApplicationCommandOptionType.Role,
+      description: 'Role to add',
+    })
     role: Role,
-    @SlashOption('name', { description: 'The name of the role' })
+    @SlashOption({
+      name: 'name',
+      type: ApplicationCommandOptionType.String,
+      description: 'The name of the role',
+    })
     name: string,
-    @SlashOption('emoji', { description: 'An emoji to use as reaction' })
+    @SlashOption({
+      name: 'emoji',
+      type: ApplicationCommandOptionType.String,
+      description: 'An emoji to use as reaction',
+    })
     emoji: string,
     interaction: CommandInteraction,
     client: Client,
@@ -58,10 +67,13 @@ export default abstract class Roles {
     await interaction.reply('Role added!');
   }
 
-  @Slash('remove')
-  @SlashGroup('reaction')
+  @Slash({ name: 'remove', description: 'remove a reaction role' })
   async remove(
-    @SlashOption('role', { type: 'ROLE', description: 'Role to remove' })
+    @SlashOption({
+      name: 'role',
+      type: ApplicationCommandOptionType.Role,
+      description: 'Role to remove',
+    })
     role: Role,
     interaction: CommandInteraction,
     client: Client,
@@ -83,8 +95,7 @@ export default abstract class Roles {
     await interaction.reply('Role removed!');
   }
 
-  @Slash('list')
-  @SlashGroup('reaction')
+  @Slash({ name: 'list', description: 'list registered reaction roles' })
   async list(
     interaction: CommandInteraction,
     client: Client,

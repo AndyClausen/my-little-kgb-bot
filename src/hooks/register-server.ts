@@ -2,11 +2,12 @@ import { ArgsOf, Discord, On } from 'discordx';
 
 import ServerModel, { Server } from '../db/models/server';
 import sendSystemMessage from '../helpers/send-system-message';
+import { Events } from 'discord.js';
 
 @Discord()
 export default class RegisterServer {
-  @On({ event: 'guildCreate' })
-  async botJoinServer([guild]: ArgsOf<'guildCreate'>): Promise<void> {
+  @On({ event: Events.GuildCreate })
+  async botJoinServer([guild]: ArgsOf<Events.GuildCreate>): Promise<void> {
     try {
       const server = await ServerModel.create({
         _id: guild.id,
@@ -29,8 +30,8 @@ export default class RegisterServer {
     }
   }
 
-  @On('guildDelete')
-  async botLeaveServer([guild]: ArgsOf<'guildDelete'>): Promise<void> {
+  @On({ event: Events.GuildDelete })
+  async botLeaveServer([guild]: ArgsOf<Events.GuildDelete>): Promise<void> {
     if (!guild.available) {
       return;
     }

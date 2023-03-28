@@ -1,5 +1,5 @@
 import { Client, Discord, Guard, Slash } from 'discordx';
-import { CommandInteraction, MessageEmbed } from 'discord.js';
+import { CommandInteraction, EmbedBuilder } from 'discord.js';
 
 import IsMember from '../guards/commands/is-member';
 import ServerExists from '../guards/config/server-exists';
@@ -8,7 +8,10 @@ import GuardCache from '../types/GuardCache';
 
 @Discord()
 export default class Useful {
-  @Slash('invite')
+  @Slash({
+    name: 'invite',
+    description: 'Create a temporary, single-use invite - usage of this command is logged',
+  })
   @Guard(ServerExists, IsMember)
   async createInvite(
     interaction: CommandInteraction,
@@ -16,9 +19,9 @@ export default class Useful {
     { server }: GuardCache
   ): Promise<void> {
     if (
-      !interaction.channel.isText() ||
+      !interaction.channel.isTextBased() ||
       interaction.channel.isThread() ||
-      interaction.channel.type === 'DM'
+      interaction.channel.isDMBased()
     ) {
       return;
     }
@@ -27,11 +30,11 @@ export default class Useful {
       interaction.guild,
       {
         embeds: [
-          new MessageEmbed({
+          new EmbedBuilder({
             description: `An invite link has been created by ${interaction.member}`,
             author: {
               name: interaction.user.tag,
-              iconURL: interaction.user.avatarURL({ dynamic: true }),
+              iconURL: interaction.user.avatarURL(),
             },
           }),
         ],

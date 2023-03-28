@@ -3,7 +3,7 @@ import { Client } from 'discordx';
 import { importx, dirname } from '@discordx/importer';
 import { config, parse } from 'dotenv';
 import { promises as fs } from 'fs';
-import { Intents } from 'discord.js';
+import { ActivityType, IntentsBitField } from 'discord.js';
 
 import configMongoose from './db/config-mongoose';
 import createScheduledMessage from './helpers/create-scheduled-message';
@@ -25,14 +25,14 @@ async function start() {
   const client = new Client({
     guards: [NotBot],
     intents: [
-      Intents.FLAGS.GUILDS,
-      Intents.FLAGS.GUILD_BANS,
-      Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-      Intents.FLAGS.GUILD_INVITES,
-      Intents.FLAGS.GUILD_MESSAGES,
-      Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-      Intents.FLAGS.GUILD_VOICE_STATES,
-      Intents.FLAGS.DIRECT_MESSAGES,
+      IntentsBitField.Flags.Guilds,
+      IntentsBitField.Flags.GuildBans,
+      IntentsBitField.Flags.GuildEmojisAndStickers,
+      IntentsBitField.Flags.GuildInvites,
+      IntentsBitField.Flags.GuildMessages,
+      IntentsBitField.Flags.GuildMessageReactions,
+      IntentsBitField.Flags.GuildVoiceStates,
+      IntentsBitField.Flags.DirectMessages,
     ],
     botGuilds: process.env.TEST_SERVER ? [process.env.TEST_SERVER] : undefined,
     ...(process.env.NODE_ENV === 'development' && { silent: false }),
@@ -76,7 +76,7 @@ async function start() {
       .filter((s) => s.reactionRolesChannelId)
       .map(async (s) => {
         const c = await client.channels.fetch(s.reactionRolesChannelId);
-        if (c.isText()) {
+        if (c.isTextBased()) {
           return c.messages.fetch(s.reactionRolesMessageId);
         }
       })
@@ -86,8 +86,8 @@ async function start() {
   client.user.setPresence({
     activities:
       process.env.NODE_ENV === 'development'
-        ? [{ type: 'WATCHING', name: 'Andy develop me' }]
-        : [{ type: 'WATCHING', name: 'over the Gulag' }],
+        ? [{ type: ActivityType.Watching, name: 'Andy develop me' }]
+        : [{ type: ActivityType.Watching, name: 'over the Gulag' }],
   });
 }
 
