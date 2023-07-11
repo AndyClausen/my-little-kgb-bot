@@ -6,7 +6,7 @@ import Mongoose from 'mongoose';
 
 import { Volunteer } from './volunteer';
 import { Config } from './config';
-import { ReactionRole } from './reaction-role';
+import { Role } from './role';
 
 export class Server extends TimeStamps {
   @prop({ type: String, required: true })
@@ -18,14 +18,14 @@ export class Server extends TimeStamps {
   @prop({ type: Volunteer, default: [], required: true })
   gulag!: Mongoose.Types.Array<Volunteer>;
 
-  @prop({ type: ReactionRole, default: [], required: true })
-  reactionRoles!: Mongoose.Types.Array<ReactionRole>;
+  @prop({ type: Role, default: [], required: true })
+  roles!: Mongoose.Types.Array<Role>;
 
   @prop({ type: String, required: false })
-  reactionRolesMessageId?: Snowflake;
+  rolesMessageId?: Snowflake;
 
   @prop({ type: String, required: false })
-  reactionRolesChannelId?: Snowflake;
+  rolesChannelId?: Snowflake;
 }
 
 const ServerModel = getModelForClass(Server);

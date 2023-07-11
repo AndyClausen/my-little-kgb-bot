@@ -17,7 +17,7 @@ export default class RegisterServer {
           russianRoulette: false,
         },
         gulag: [],
-        reactionRoles: [],
+        roles: [],
       } as Server);
       await sendSystemMessage(
         guild,

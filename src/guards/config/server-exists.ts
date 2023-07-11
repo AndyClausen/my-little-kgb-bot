@@ -1,13 +1,5 @@
 import { ArgsOf, GuardFunction, SimpleCommandMessage } from 'discordx';
-import {
-  ButtonInteraction,
-  CommandInteraction,
-  ContextMenuCommandInteraction,
-  Events,
-  Message,
-  SelectMenuInteraction,
-  VoiceState,
-} from 'discord.js';
+import { BaseInteraction, Events, Message, VoiceState } from 'discord.js';
 
 import ServerModel from '../../db/models/server';
 import GuardCache from '../../types/GuardCache';
@@ -19,20 +11,15 @@ const ServerExists: GuardFunction<
       | Events.MessageReactionAdd
       | Events.MessageReactionRemove
     >
-  | CommandInteraction
-  | ContextMenuCommandInteraction
-  | SelectMenuInteraction
-  | ButtonInteraction
+  | BaseInteraction
   | SimpleCommandMessage,
   GuardCache
 > = async (arg, client, next, nextObj) => {
   const messageOrInteraction = arg instanceof Array ? arg[0] : arg;
   const guild =
-    messageOrInteraction instanceof CommandInteraction ||
+    messageOrInteraction instanceof BaseInteraction ||
     messageOrInteraction instanceof Message ||
-    messageOrInteraction instanceof VoiceState ||
-    messageOrInteraction instanceof ButtonInteraction ||
-    messageOrInteraction instanceof SelectMenuInteraction
+    messageOrInteraction instanceof VoiceState
       ? messageOrInteraction.guild
       : messageOrInteraction.message.guild;
   if (!guild) {
@@ -40,7 +27,7 @@ const ServerExists: GuardFunction<
   }
   const server = await ServerModel.findById(guild.id);
   if (!server) {
-    if (messageOrInteraction instanceof CommandInteraction) {
+    if (messageOrInteraction instanceof BaseInteraction && messageOrInteraction.isRepliable()) {
       await messageOrInteraction.reply(
         `I may not have been configured properly! Please re-add me to your server or contact Andy.`
       );

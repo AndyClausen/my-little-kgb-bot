@@ -8,7 +8,6 @@ import { ActivityType, IntentsBitField } from 'discord.js';
 import configMongoose from './db/config-mongoose';
 import createScheduledMessage from './helpers/create-scheduled-message';
 import ScheduledMessageModel from './db/models/scheduled-message';
-import server from './db/models/server';
 import { NotBot } from './guards/messages/not-bot';
 
 async function start() {
@@ -67,20 +66,8 @@ async function start() {
   console.log('Scheduling messages...');
   // scheduled messages
   const scheduledMessages = await ScheduledMessageModel.find();
-  scheduledMessages.map((msg) => createScheduledMessage(client, msg));
-
-  console.log('Initializing reaction roles...');
-  const servers = await server.find();
-  await Promise.all(
-    servers
-      .filter((s) => s.reactionRolesChannelId)
-      .map(async (s) => {
-        const c = await client.channels.fetch(s.reactionRolesChannelId);
-        if (c.isTextBased()) {
-          return c.messages.fetch(s.reactionRolesMessageId);
-        }
-      })
-  );
+  scheduledMessages.forEach((msg) => createScheduledMessage(client, msg));
+  console.log(`Scheduled ${scheduledMessages.length} messages`);
 
   console.log('Setting presence...');
   client.user.setPresence({
