@@ -12,6 +12,15 @@ export class Citizen extends TimeStamps {
 
   @prop({ default: 0, required: true })
   gulagCount!: number;
+
+  @prop()
+  birthdayYear?: number;
+
+  @prop()
+  birthdayMonth?: number;
+
+  @prop()
+  birthdayDate?: number;
 }
 
 const CitizenModel = getModelForClass(Citizen);

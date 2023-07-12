@@ -30,17 +30,34 @@ export class Config {
   @prop({ default: false, required: true })
   russianRoulette!: boolean;
 
+  @prop()
+  birthdayHour?: number;
+
+  @prop()
+  birthdayTemplate?: string;
+
+  @prop()
+  birthdayTemplateWithAge?: string;
+
   static isValidKey(key: string | number | symbol | null): key is keyof Config {
     return key && key in ConfigModel.schema.paths;
   }
 
   static isStringProp(key: keyof Config): key is PropsOfType<Config, string> {
-    const props: Array<string> = ['memberRole', 'adminRole', 'modRole', 'gulagRole', 'logChannel'];
+    const props: Array<string> = [
+      'memberRole',
+      'adminRole',
+      'modRole',
+      'gulagRole',
+      'logChannel',
+      'birthdayTemplate',
+      'birthdayTemplateWithAge',
+    ];
     return props.includes(key);
   }
 
   static isNumberProp(key: keyof Config): key is PropsOfType<Config, number> {
-    const props: Array<string> = ['susChance'];
+    const props: Array<string> = ['susChance', 'birthdayHour'];
     return props.includes(key);
   }
 

@@ -17,6 +17,7 @@ import IsValidKey from '../guards/config/is-valid-key';
 import ServerExists from '../guards/config/server-exists';
 import GuardCache from '../types/GuardCache';
 import { IsAdmin } from '../guards/commands/is-admin';
+import scheduleBirthdayMessage from '../helpers/schedule-birthday-message';
 
 @Discord()
 @Guard(ServerExists, IsAdmin)
@@ -139,6 +140,15 @@ export default class Config {
         await interaction.reply({ content: 'Please enter a valid number', ephemeral: true });
         return;
       }
+      if (key === 'birthdayHour') {
+        if (numValue < 0 || numValue > 23 || numValue % 1 !== 0) {
+          await interaction.reply({
+            content: 'Please enter a whole number between 0 and 23',
+            ephemeral: true,
+          });
+          return;
+        }
+      }
       if (key === 'susChance') {
         if (numValue <= 0 || numValue > 1) {
           await interaction.reply({
@@ -171,6 +181,9 @@ export default class Config {
       content: `${key} has been set to ${server.config[key]}`,
       ephemeral: true,
     });
+    if (key === 'birthdayHour') {
+      scheduleBirthdayMessage(client, server);
+    }
   }
 
   @Slash({ name: 'get', description: 'get the value of a config key' })

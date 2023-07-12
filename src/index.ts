@@ -9,6 +9,8 @@ import configMongoose from './db/config-mongoose';
 import createScheduledMessage from './helpers/create-scheduled-message';
 import ScheduledMessageModel from './db/models/scheduled-message';
 import { NotBot } from './guards/messages/not-bot';
+import ServerModel from './db/models/server';
+import scheduleBirthdayMessage from './helpers/schedule-birthday-message';
 
 async function start() {
   console.log('Reading env...');
@@ -68,6 +70,10 @@ async function start() {
   const scheduledMessages = await ScheduledMessageModel.find();
   scheduledMessages.forEach((msg) => createScheduledMessage(client, msg));
   console.log(`Scheduled ${scheduledMessages.length} messages`);
+
+  console.log('Scheduling birthday check...');
+  const servers = await ServerModel.find();
+  servers.forEach((s) => void scheduleBirthdayMessage(client, s));
 
   console.log('Setting presence...');
   client.user.setPresence({

@@ -26,6 +26,9 @@ export class Server extends TimeStamps {
 
   @prop({ type: String, required: false })
   rolesChannelId?: Snowflake;
+
+  @prop({ type: () => String, required: false })
+  birthdayChannel?: Snowflake;
 }
 
 const ServerModel = getModelForClass(Server);
