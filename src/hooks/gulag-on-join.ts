@@ -14,7 +14,7 @@ export default class GulagOnJoin {
     client: Client,
     { server }: GuardCache
   ): Promise<void> {
-    if (!server.config.gulagRole) {
+    if (!server.config.gulagOnJoin || !server.config.gulagRole) {
       return;
     }
     await member.roles.add(server.config.gulagRole);

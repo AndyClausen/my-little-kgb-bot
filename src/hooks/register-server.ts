@@ -15,6 +15,7 @@ export default class RegisterServer {
           susChance: 0.01,
           randomSus: false,
           russianRoulette: false,
+          gulagOnJoin: false,
         },
         gulag: [],
         roles: [],

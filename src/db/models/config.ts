@@ -30,6 +30,9 @@ export class Config {
   @prop({ default: false, required: true })
   russianRoulette!: boolean;
 
+  @prop({ default: false, required: true })
+  gulagOnJoin!: boolean;
+
   @prop()
   birthdayHour?: number;
 
@@ -62,7 +65,7 @@ export class Config {
   }
 
   static isBooleanProp(this: void, key: keyof Config): key is PropsOfType<Config, boolean> {
-    const props: Array<string> = ['randomSus', 'russianRoulette'];
+    const props: Array<string> = ['randomSus', 'russianRoulette', 'gulagOnJoin'];
     return props.includes(key);
   }
 }
