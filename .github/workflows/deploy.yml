@@ -9,13 +9,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4.1.7
       - uses: easingthemes/ssh-deploy@v5.0.3
         with:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          SOURCE: 'src, package.json, tsconfig.json, yarn.lock'
+          SOURCE: 'src package.json tsconfig.json yarn.lock'
           TARGET: ${{ secrets.REMOTE_TARGET }}
           SCRIPT_BEFORE: ls
-          SCRIPT_AFTER: ${{ vars.POST_DEPLOY_SCRIPT }}
+          SCRIPT_AFTER: |
+            ${{ vars.POST_DEPLOY_SCRIPT }}
+            echo $RSYNC_STDOUT
