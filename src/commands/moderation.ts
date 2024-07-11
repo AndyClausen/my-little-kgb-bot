@@ -167,6 +167,7 @@ export default abstract class Moderation {
       type: ApplicationCommandOptionType.Number,
       description: 'Amount of messages to delete',
       minValue: 1,
+      required: true,
     })
     amount: number,
     interaction: CommandInteraction
@@ -185,7 +186,7 @@ export default abstract class Moderation {
     await interaction.reply('Cleaning up...');
     const messages = await interaction.channel.messages.fetch({ limit: amount + 1 });
     await interaction.channel.bulkDelete(
-      messages.filter((msg) => msg.interaction?.id !== interaction.id)
+      messages.filter((msg) => msg.interaction?.id !== interaction.id && !msg.pinned)
     );
     await interaction.deleteReply();
   }
