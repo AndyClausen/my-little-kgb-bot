@@ -115,11 +115,11 @@ export default abstract class Roles {
     const rolesMapped = await Promise.all(
       server.roles.toObject<DBRole[]>().map(async (role) => ({
         ...role,
-        name: (await interaction.guild.roles.fetch(role._id)).name,
+        name: (await interaction.guild.roles.fetch(role._id))?.name,
       }))
     );
     const msg = `Roles:\n\`\`\`\n${rolesMapped.reduce(
-      (acc, role) => acc + `${role._id} | ${role.name} | ${role.emoji}\n`,
+      (acc, role) => acc + `${role._id} | ${role?.name ?? 'could not find role'} | ${role.emoji}\n`,
       ''
     )}\n\`\`\``;
     await interaction.reply({ content: msg, ephemeral: true });
@@ -172,17 +172,19 @@ export default abstract class Roles {
     const rolesMapped = await Promise.all(
       server.roles.toObject<DBRole[]>().map(async (role) => ({
         ...role,
-        name: (await rolesChannel.guild.roles.fetch(role._id)).name,
+        name: (await rolesChannel.guild.roles.fetch(role._id))?.name,
       }))
     );
     const roleButtons = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      rolesMapped.map((role) =>
-        new ButtonBuilder()
-          .setEmoji(role.emoji)
-          .setCustomId(roleButtonPrefix + role._id)
-          .setStyle(ButtonStyle.Secondary)
-          .setLabel(role.name)
-      )
+      rolesMapped
+        .filter((roles) => roles.name)
+        .map((role) =>
+          new ButtonBuilder()
+            .setEmoji(role.emoji)
+            .setCustomId(roleButtonPrefix + role._id)
+            .setStyle(ButtonStyle.Secondary)
+            .setLabel(role.name)
+        )
     );
     let roleMessage: Message;
     if (server.rolesMessageId) {
