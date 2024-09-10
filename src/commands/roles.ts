@@ -119,7 +119,7 @@ export default abstract class Roles {
       }))
     );
     const msg = `Roles:\n\`\`\`\n${rolesMapped.reduce(
-      (acc, role) => acc + `${role._id} | ${role?.name ?? 'could not find role'} | ${role.emoji}\n`,
+      (acc, role) => acc + `${role._id} | ${role.name ?? 'could not find role'} | ${role.emoji}\n`,
       ''
     )}\n\`\`\``;
     await interaction.reply({ content: msg, ephemeral: true });
@@ -173,6 +173,8 @@ export default abstract class Roles {
       server.roles.toObject<DBRole[]>().map(async (role) => ({
         ...role,
         name: (await rolesChannel.guild.roles.fetch(role._id))?.name,
+        emoji:
+          role.emoji.length > 5 ? await rolesChannel.guild.emojis.fetch(role.emoji) : role.emoji,
       }))
     );
     const roleButtons = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
