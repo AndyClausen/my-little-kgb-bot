@@ -174,7 +174,9 @@ export default abstract class Roles {
         ...role,
         name: (await rolesChannel.guild.roles.fetch(role._id))?.name,
         emoji:
-          role.emoji.length > 5 ? await rolesChannel.guild.emojis.fetch(role.emoji) : role.emoji,
+          role.emoji.length > 5
+            ? rolesChannel.guild.emojis.resolveIdentifier(role.emoji)
+            : role.emoji,
       }))
     );
     const roleButtons = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
